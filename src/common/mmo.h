@@ -21,7 +21,7 @@
 // see conf/battle/client.conf for other version
 
 #ifndef PACKETVER
-	#define PACKETVER 20130807
+	#define PACKETVER 20151104
 	//#define PACKETVER 20120410
 #endif
 
@@ -145,7 +145,7 @@
 //Mercenary System
 #define MC_SKILLBASE 8201
 #define MAX_MERCSKILL 40
-#define MAX_MERCENARY_CLASS 61
+#define MAX_MERCENARY_CLASS 64
 
 //Elemental System
 #define MAX_ELEMENTALSKILL 42

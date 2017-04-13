@@ -192,7 +192,7 @@ int npc_enable_sub(struct block_list *bl, va_list ap)
 	{
 		TBL_PC *sd = (TBL_PC*)bl;
 
-		if (nd->sc.option&OPTION_INVISIBLE)
+		if (nd->sc.option&(OPTION_HIDE|OPTION_INVISIBLE))
 			return 1;
 
 		if( npc_ontouch_event(sd,nd) > 0 && npc_ontouch2_event(sd,nd) > 0 )
@@ -963,7 +963,7 @@ int npc_touch_areanpc(struct map_session_data* sd, int16 m, int16 x, int16 y)
 
 	for(i=0;i<map[m].npc_num;i++)
 	{
-		if (map[m].npc[i]->sc.option&OPTION_INVISIBLE) {
+		if (map[m].npc[i]->sc.option&(OPTION_HIDE|OPTION_INVISIBLE)) {
 			f=0; // a npc was found, but it is disabled; don't print warning
 			continue;
 		}
@@ -1050,7 +1050,7 @@ int npc_touch_areanpc2(struct mob_data *md)
 
 	for( i = 0; i < map[m].npc_num; i++ )
 	{
-		if( map[m].npc[i]->sc.option&OPTION_INVISIBLE )
+		if( map[m].npc[i]->sc.option&(OPTION_HIDE|OPTION_INVISIBLE) )
 			continue;
 
 		switch( map[m].npc[i]->subtype )
@@ -1136,7 +1136,7 @@ int npc_check_areanpc(int flag, int16 m, int16 x, int16 y, int16 range)
 	//Now check for the actual NPC on said range.
 	for(i=0;i<map[m].npc_num;i++)
 	{
-		if (map[m].npc[i]->sc.option&OPTION_INVISIBLE)
+		if (map[m].npc[i]->sc.option&(OPTION_HIDE|OPTION_INVISIBLE))
 			continue;
 
 		switch(map[m].npc[i]->subtype)

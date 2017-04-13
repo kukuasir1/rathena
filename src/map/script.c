@@ -10085,10 +10085,10 @@ BUILDIN_FUNC(areamonster)
 
 	if(!allflag){
 		if(strcmp(event,md->npc_event)==0)
-			status_kill(bl);
+			unit_free(bl,CLR_DEAD);
 	}else{
 		if(!md->spawn)
-			status_kill(bl);
+			unit_free(bl,CLR_DEAD);
 	}
 	md->state.npc_killmonster = 0;
 	return SCRIPT_CMD_SUCCESS;
@@ -10102,10 +10102,10 @@ static int buildin_killmonster_sub(struct block_list *bl,va_list ap)
 
 	if(!allflag){
 		if(strcmp(event,md->npc_event)==0)
-			status_kill(bl);
+			unit_free(bl,CLR_DEAD);
 	}else{
 		if(!md->spawn)
-			status_kill(bl);
+			unit_free(bl,CLR_DEAD);
 	}
 	return SCRIPT_CMD_SUCCESS;
 }
@@ -10145,12 +10145,12 @@ static int buildin_killmonsterall_sub_strip(struct block_list *bl,va_list ap)
 	if (md->npc_event[0])
 		md->npc_event[0] = 0;
 
-	status_kill(bl);
+	unit_free(bl,CLR_DEAD);
 	return 0;
 }
 static int buildin_killmonsterall_sub(struct block_list *bl,va_list ap)
 {
-	status_kill(bl);
+	unit_free(bl,CLR_DEAD);
 	return 0;
 }
 BUILDIN_FUNC(killmonsterall)
@@ -22404,6 +22404,43 @@ BUILDIN_FUNC(preg_match) {
 #endif
 }
 
+BUILDIN_FUNC(progressbar2)
+{
+	struct npc_data* nd = NULL;
+	const char * color;
+	unsigned int second;
+
+	nd = npc_name2id(script_getstr(st, 2));
+	color = script_getstr(st,3);
+	second = script_getnum(st,4);
+
+	if( !st->sleep.tick ) {
+		// sleep for the target amount of time
+		st->state = RERUNLINE;
+		st->sleep.tick = second*1000;
+		if (nd != NULL) {
+			clif_progressbar2(&nd->bl,strtol(color, (char **)NULL, 0), second);
+		}
+	} else {
+		// sleep time is over
+		st->state = RUN;
+		st->sleep.tick = 0;
+		script_pushint(st, (map_id2sd(st->rid)!=NULL));
+	}
+
+	return SCRIPT_CMD_SUCCESS;
+}
+
+//mobeffect <GID>,<effect_type>;
+BUILDIN_FUNC(mobeffect) {
+	int type = script_getnum(st,3);
+	struct block_list *bl = map_id2bl(script_getnum(st,2));
+	if (bl) {
+		clif_specialeffect(bl,type,AREA);
+	}
+	return SCRIPT_CMD_SUCCESS;
+}
+
 /// script command definitions
 /// for an explanation on args, see add_buildin_func
 struct script_function buildin_func[] = {
@@ -22963,6 +23000,9 @@ struct script_function buildin_func[] = {
 	BUILDIN_DEF(agitcheck3,""),
 	BUILDIN_DEF(gvgon3,"s"),
 	BUILDIN_DEF(gvgoff3,"s"),
+
+	BUILDIN_DEF(progressbar2,"ssi"),
+	BUILDIN_DEF(mobeffect,"ii"),
 
 #include "../custom/script_def.inc"
 

@@ -178,7 +178,7 @@ char* normalize_name(char* str,const char* delims)
 	char* in = str;
 	char* out = str;
 	int put_space = 0;
-
+	return trim(str);
 	if( str == NULL || delims == NULL )
 		return str;
 

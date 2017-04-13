@@ -224,6 +224,7 @@ void initChangeTables(void)
 	set_sc( NPC_BLEEDING		, SC_BLEEDING		, SI_BLEEDING		, SCB_REGEN );
 	set_sc( NPC_POISON		, SC_DPOISON		, SI_BLANK		, SCB_DEF2|SCB_REGEN );
 	add_sc( ALL_REVERSEORCISH,	SC_ORCISH );
+	set_sc( NPC_WIDEWEB			, SC_SPIDERWEB		, SI_WIDEWEB		, SCB_FLEE );
 
 	/* The main status definitions */
 	add_sc( SM_BASH			, SC_STUN		);
@@ -522,6 +523,7 @@ void initChangeTables(void)
 	add_sc( NPC_WIDECURSE		, SC_CURSE		);
 	add_sc( NPC_WIDESTUN		, SC_STUN		);
 
+	add_sc( NPC_WIDEWEB			, SC_SPIDERWEB );
 	set_sc( NPC_HELLPOWER		, SC_HELLPOWER		, SI_HELLPOWER		, SCB_NONE );
 	set_sc( NPC_WIDEHELLDIGNITY	, SC_HELLPOWER		, SI_HELLPOWER		, SCB_NONE );
 	set_sc( NPC_INVINCIBLE		, SC_INVINCIBLE		, SI_INVINCIBLE		, SCB_SPEED );
@@ -2427,8 +2429,8 @@ unsigned short status_base_matk(struct block_list *bl, const struct status_data*
 	switch (bl->type) {
 		case BL_MOB:
 			///! TODO: Confirm these RENEWAL calculations. Currently is using previous calculation before 083cf5d9 (issue: #321) and until re/mob_db.txt is updated.
-			//return status->int_ + level;
-			return status->int_ + (status->int_ / 2) + (status->dex / 5) + (status->luk / 3) + (level / 4);
+			return status->int_ + level;
+			//return status->int_ + (status->int_ / 2) + (status->dex / 5) + (status->luk / 3) + (level / 4);
 		case BL_HOM:
 			return status_get_homint(bl) + level;
 		case BL_MER:
@@ -2514,16 +2516,16 @@ void status_calc_misc(struct block_list *bl, struct status_data *status, int lev
 	status->matk_min = status->matk_max = status_base_matk(bl, status, level);
 
 	///! TODO: Confirm these RENEWAL calculations. Currently is using previous calculation before 083cf5d9 (issue: #321) and until re/mob_db.txt is updated.
-	//switch (bl->type) {
-	//	case BL_MOB:
-	//		status->matk_min += 70 * ((TBL_MOB*)bl)->status.rhw.atk2 / 100;
-	//		status->matk_max += 130 * ((TBL_MOB*)bl)->status.rhw.atk2 / 100;
-	//		break;
-	//	case BL_MER:
-	//		status->matk_min += 70 * ((TBL_MER*)bl)->battle_status.rhw.atk2 / 100;
-	//		status->matk_max += 130 * ((TBL_MER*)bl)->battle_status.rhw.atk2 / 100;
-	//		break;
-	//}
+	switch (bl->type) {
+		case BL_MOB:
+			status->matk_min += 70 * ((TBL_MOB*)bl)->status.rhw.atk2 / 100;
+			status->matk_max += 130 * ((TBL_MOB*)bl)->status.rhw.atk2 / 100;
+			break;
+		case BL_MER:
+			status->matk_min += 70 * ((TBL_MER*)bl)->battle_status.rhw.atk2 / 100;
+			status->matk_max += 130 * ((TBL_MER*)bl)->battle_status.rhw.atk2 / 100;
+			break;
+	}
 #else
 	// Matk
 	status->matk_min = status_base_matk_min(status);

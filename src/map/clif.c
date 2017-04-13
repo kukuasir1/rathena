@@ -10517,6 +10517,22 @@ void clif_progressbar(struct map_session_data * sd, unsigned long color, unsigne
 }
 
 
+/// Displays cast-like progress bar on an NPC.
+/// 09d1 <id>.L <color>.L <time>.L
+void clif_progressbar2(struct block_list *bl, unsigned long color, unsigned int second)
+{
+	unsigned char buf[14];
+	nullpo_retv(bl);
+
+	WBUFW(buf,0) = 0x9d1;
+	WBUFL(buf,2) = bl->id;
+	WBUFL(buf,6) = color;
+	WBUFL(buf,10) = second;
+	clif_send(buf,packet_len(0x9d1),bl,AREA);//Length is 14
+	//clif_send(buf, 14, bl, AREA);
+}
+
+
 /// Removes an ongoing progress bar (ZC_PROGRESS_CANCEL).
 /// 02f2
 void clif_progressbar_abort(struct map_session_data * sd)
@@ -19526,7 +19542,7 @@ void packetdb_readdb(bool reload)
 		8,  4,  8,  4,  6,  0,  6,  4,  6,  4,  0,  0,  6,  0,  0,  0,
 	//#0x09C0
 		0,  0,  0,  8,  8,  0,  0,  0,  0,  0, 23,  17,  0,  0,102,  0,
-		0,  0,  0,  0,  2,  0, -1, -1,  2,  0,  0,  -1,  -1,  -1,  0,  7,
+		0,  14,  0,  0,  2,  0, -1, -1,  2,  0,  0,  -1,  -1,  -1,  0,  7,
 		0,  0,  0,  0,  0,  18,  22,  3, 11,  0, 11, -1,  0,  3, 11,  0,
 		0, 11, 12, 11,  0,  0,  0,  75,  -1,143,  0,  0,  0,  -1,  -1,  -1,
 	//#0x0A00

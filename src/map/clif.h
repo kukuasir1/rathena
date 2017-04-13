@@ -903,6 +903,7 @@ void clif_party_show_picker(struct map_session_data * sd, struct item * item_dat
 
 // Progress Bar [Inkfish]
 void clif_progressbar(struct map_session_data * sd, unsigned long color, unsigned int second);
+void clif_progressbar2(struct block_list *bl, unsigned long color, unsigned int second);
 void clif_progressbar_abort(struct map_session_data * sd);
 
 void clif_PartyBookingRegisterAck(struct map_session_data *sd, int flag);
