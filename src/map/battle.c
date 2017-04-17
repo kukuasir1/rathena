@@ -1902,8 +1902,14 @@ static int64 battle_calc_base_damage(struct status_data *status, struct weapon_a
 			atkmin = status->matk_min;
 			atkmax = status->matk_max;
 		} else {
+			//remarked by Michael 2016-07-29
+#ifndef RENEWAL
 			atkmin = wa->atk;
 			atkmax = wa->atk2;
+#else
+			atkmin = status->ele_lv + wa->atk * 80 /100;
+			atkmax = status->ele_lv + wa->atk * 120 /100;
+#endif
 		}
 		if (atkmin > atkmax)
 			atkmin = atkmax;
