@@ -620,6 +620,8 @@ extern struct Battle_Config
 	int hide_fav_sell;
 	int feature_achievement;
 
+	int raspd_type;                         // CRO攻速公式开关 [夜天师]
+
 #include "../custom/battle_config_struct.inc"
 } battle_config;
 

@@ -2331,8 +2331,10 @@ int status_base_amotion_pc(struct map_session_data* sd, struct status_data* stat
 	// Percentual delay reduction from stats
 	amotion -= amotion * (4*status->agi + status->dex)/1000;
 #endif
+	if (!battle_config.raspd_type) // CRO攻速公式开关 [夜天师]
+
 	// Raw delay adjustment from bAspd bonus
-	amotion += sd->bonus.aspd_add;
+		amotion += sd->bonus.aspd_add;
 
  	return amotion;
 }
@@ -5049,12 +5051,33 @@ void status_calc_bl_main(struct block_list *bl, /*enum scb_flag*/int flag)
 			if(status->aspd_rate != 1000)
 				amotion = amotion*status->aspd_rate/1000;
 #else
-			/// aspd = baseaspd + floor(sqrt((agi^2/2) + (dex^2/5))/4 + (potskillbonus*agi/200))
-			amotion -= (int)(sqrt( (pow(status->agi, 2) / 2) + (pow(status->dex, 2) / 5) ) / 4 + (status_calc_aspd(bl, sc, true) * status->agi / 200)) * 10;
+			if (!battle_config.raspd_type)// CRO攻速公式开关 [夜天师]
+			{
+				/// aspd = baseaspd + floor(sqrt((agi^2/2) + (dex^2/5))/4 + (potskillbonus*agi/200))
+				amotion -= (int)(sqrt( (pow(status->agi, 2) / 2) + (pow(status->dex, 2) / 5) ) / 4 + (status_calc_aspd(bl, sc, true) * status->agi / 200)) * 10;
 
-			if( (status_calc_aspd(bl, sc, false) + status->aspd_rate2) != 0 ) // RE ASPD percertage modifier
-				amotion -= ( amotion - pc_maxaspd(sd) ) * (status_calc_aspd(bl, sc, false) + status->aspd_rate2) / 100;
+				if( (status_calc_aspd(bl, sc, false) + status->aspd_rate2) != 0 ) // RE ASPD percertage modifier
+					amotion -= ( amotion - pc_maxaspd(sd) ) * (status_calc_aspd(bl, sc, false) + status->aspd_rate2) / 100;
+			} else {
+				// CS_eA TwROiRO Renewal Aspd Calc [Sense]
+				int bonus = ((~sd->bonus.aspd_add+1) / 10);
+				double 
+					BaseAspd	= ( 2000.0 - (status_base_amotion_pc(sd,status))) / 10.0 ,
+					Penalty		= 1 - ( BaseAspd - 144.0 ) / 50.0 ,
+					Correction	= (sqrt(205.0) - sqrt(status->agi)) / 7.15 ,
+					renewal_aspd = 0.0;
 
+				renewal_aspd = 200.0 - ( 200.0 - (BaseAspd - Correction + sqrt( status->agi * 9.999 + status->dex * 0.19212 ) * Penalty));
+				renewal_aspd += (status_calc_aspd(bl, sc, 1)/40.0)*(200.0-renewal_aspd);
+				renewal_aspd += bonus;
+
+				amotion = status_base_amotion_pc(sd,status) - ((int) ((renewal_aspd - BaseAspd) * 10));
+
+				if( (status_calc_aspd(bl, sc, 2) + status->aspd_rate2) != 0 ) // RE ASPD percertage modifier
+					amotion -= ( amotion - ((sd->class_&JOBL_THIRD) ? battle_config.max_third_aspd : battle_config.max_aspd) )
+								* (status_calc_aspd(bl, sc, 2) + status->aspd_rate2) / 100;
+			}
+			//END- CRO攻速公式开关 [夜天师]
 			if(status->aspd_rate != 1000) // Absolute percentage modifier
 				amotion = ( 200 - (200-amotion/10) * status->aspd_rate / 1000 ) * 10;
 #endif

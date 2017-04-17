@@ -8422,6 +8422,8 @@ static const struct _battle_data {
 	{ "hide_fav_sell", 			&battle_config.hide_fav_sell,			0,      0,      1,              },
 	{ "feature.achievement",                &battle_config.feature_achievement,             1,      0,      1,              },
 
+	{ "Renewal.aspd_type",		            &battle_config.raspd_type,						1,      0,      1,              },// CRO攻速公式开关 [夜天师]
+
 #include "../custom/battle_config_init.inc"
 };
 
