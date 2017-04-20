@@ -11483,7 +11483,6 @@ int skill_castend_pos2(struct block_list* src, int x, int y, uint16 skill_id, ui
 			src, skill_id, skill_lv, tick, flag|BCT_ENEMY|1,
 			skill_castend_damage_id);
 		break;
-
 	case BS_HAMMERFALL:
 		i = skill_get_splash(skill_id, skill_lv);
 		map_foreachinarea(skill_area_sub,
@@ -11499,7 +11498,6 @@ int skill_castend_pos2(struct block_list* src, int x, int y, uint16 skill_id, ui
 			src,NULL,SC_SIGHT,tick);
 		skill_reveal_trap_inarea(src, i, x, y);
 		break;
-
 	case SR_RIDEINLIGHTNING:
 		i = skill_get_splash(skill_id, skill_lv);
 		map_foreachinarea(skill_area_sub, src->m, x-i, y-i, x+i, y+i, BL_CHAR,
@@ -11593,6 +11591,8 @@ int skill_castend_pos2(struct block_list* src, int x, int y, uint16 skill_id, ui
 	case NPC_EVILLAND:
 	case NPC_VENOMFOG:
 	case NPC_HELLBURNING:
+	case NPC_FLAMECROSS:
+	case NPC_ICEMINE:
 	case RA_ELECTRICSHOCKER:
 	case RA_CLUSTERBOMB:
 	case RA_MAGENTATRAP:
@@ -13461,6 +13461,8 @@ int skill_unit_onplace_timer(struct skill_unit *unit, struct block_list *bl, uns
 		case UNT_MAKIBISHI:
 		case UNT_VENOMFOG:
 		case UNT_HELLBURNING:
+		case UNT_FLAMECROSS:
+		case UNT_ICEMINE:
 			skill_attack(skill_get_type(sg->skill_id),ss,&unit->bl,bl,sg->skill_id,sg->skill_lv,tick,0);
 			break;
 
@@ -20107,6 +20109,7 @@ void skill_init_unit_layout (void) {
 						memcpy(skill_unit_layout[pos].dy,dy,sizeof(dy));
 					}
 					break;
+				case NPC_FLAMECROSS:
 				case CR_GRANDCROSS:
 				case NPC_GRANDDARKNESS: {
 						static const int dx[] = {
