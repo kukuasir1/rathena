@@ -487,6 +487,7 @@ void initChangeTables(void)
 	add_sc( NPC_WIDECURSE		, SC_CURSE		);
 	add_sc( NPC_WIDESTUN		, SC_STUN		);
 
+	set_sc_with_vfx( NPC_WIDESUCK	, SC_BLOODSUCKER	, SI_BLOODSUCKER		, SCB_NONE );
 	add_sc( NPC_WIDEWEB			, SC_SPIDERWEB );
 	set_sc( NPC_HELLPOWER		, SC_HELLPOWER		, SI_HELLPOWER		, SCB_NONE );
 	set_sc( NPC_WIDEHELLDIGNITY	, SC_HELLPOWER		, SI_HELLPOWER		, SCB_NONE );

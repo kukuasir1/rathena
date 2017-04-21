@@ -1455,6 +1455,7 @@ int skill_additional_effect(struct block_list* src, struct block_list *bl, uint1
 		sc_start4(src,bl,SC_BURNING,15,skill_lv,1000,src->id,0,skill_get_time(skill_id,skill_lv));
 		break;
 	case RK_DRAGONBREATH_WATER:
+	case NPC_ICEMINE:
 		sc_start(src,bl,SC_FREEZING,15,skill_lv,skill_get_time(skill_id,skill_lv));
 		break;
 	case AB_ADORAMUS:
@@ -5266,7 +5267,6 @@ int skill_castend_damage_id (struct block_list* src, struct block_list *bl, uint
 			status_percent_damage(src, src, 0, 100, false);
 		}
 		break;
-
 	case NPC_BLOODDRAIN:
 	case NPC_ENERGYDRAIN:
 		{
@@ -8871,6 +8871,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 	case NPC_WIDE_DEEP_SLEEP:
 	case NPC_WIDESIREN:
 	case NPC_WIDEWEB:
+	case NPC_WIDESUCK:
 		if (flag&1){
 			switch ( type ) {
 			case SC_BURNING:
