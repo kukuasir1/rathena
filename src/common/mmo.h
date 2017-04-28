@@ -211,6 +211,12 @@ struct achievement_data {
 };
 */
 
+struct s_item_randomoption {
+	short id;
+	short value;
+	char param;
+};
+
 struct item {
 	int id;
 	unsigned short nameid;
@@ -220,11 +226,7 @@ struct item {
 	char refine;
 	char attribute;
 	unsigned short card[MAX_SLOTS];
-	struct {
-		short id;
-		short value;
-		char param;
-	} option[MAX_ITEM_RDM_OPT];		// max of 5 random options can be supported.
+	struct s_item_randomoption option[MAX_ITEM_RDM_OPT];		// max of 5 random options can be supported.
 	unsigned int expire_time;
 	char favorite, bound;
 	uint64 unique_id;
