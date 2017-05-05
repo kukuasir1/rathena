@@ -39,7 +39,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -133,6 +133,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>ws2_32.lib;$(SolutionDir).vs\build\common.lib;$(SolutionDir).vs\build\libconfig.lib;$(SolutionDir).vs\build\mt19937ar.lib;$(SolutionDir)3rdparty\mysql\lib\$(Platform)\libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -161,6 +162,7 @@
     <ClInclude Include="char_logif.h" />
     <ClInclude Include="char_mapif.h" />
     <ClInclude Include="inter.h" />
+    <ClInclude Include="int_achievement.h" />
     <ClInclude Include="int_auction.h" />
     <ClInclude Include="int_clan.h" />
     <ClInclude Include="int_elemental.h" />
@@ -180,6 +182,7 @@
     <ClCompile Include="char_logif.c" />
     <ClCompile Include="char_mapif.c" />
     <ClCompile Include="inter.c" />
+    <ClCompile Include="int_achievement.c" />
     <ClCompile Include="int_auction.c" />
     <ClCompile Include="int_clan.c" />
     <ClCompile Include="int_elemental.c" />
