@@ -5890,7 +5890,6 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
 						else
 							skillratio += 900 + 500 * skill_lv; 
 						break;
-					case NPC_VENOMFOG:
 					case NPC_ICEMINE:
 					case NPC_FLAMECROSS:
 						skillratio += 600 + 100 * skill_lv;
