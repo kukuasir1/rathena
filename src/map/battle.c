@@ -5879,24 +5879,6 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
 					case NPC_EARTHQUAKE:
 						skillratio += 100 + 100 * skill_lv + 100 * (skill_lv / 2) + ((skill_lv > 4) ? 100 : 0);
 						break;
-					case NPC_COMET:
-						i = (sc ? distance_xy(target->x, target->y, sc->comet_x, sc->comet_y) : 8);
-						if(i <= 3)
-							skillratio += 2400 + 500 * skill_lv;
-						else if(i <= 5)
-							skillratio += 1900 + 500 * skill_lv;
-						else if(i <= 7)
-							skillratio += 1400 + 500 * skill_lv;
-						else
-							skillratio += 900 + 500 * skill_lv; 
-						break;
-					case NPC_ICEMINE:
-					case NPC_FLAMECROSS:
-						skillratio += 600 + 100 * skill_lv;
-						break;
-					case NPC_HELLBURNING:
-						skillratio += 900;
-						break;
 #ifdef RENEWAL
 					case WZ_HEAVENDRIVE:
 					case WZ_METEOR:
@@ -6141,8 +6123,24 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
 					case SU_CN_METEOR:
 						skillratio += 100 + 100 * skill_lv;
 						break;
+					case NPC_ICEMINE:
+					case NPC_FLAMECROSS:
 					case NPC_VENOMFOG:
 						skillratio += 600 + 100 * skill_lv;
+						break;
+					case NPC_COMET:
+						i = (sc ? distance_xy(target->x, target->y, sc->comet_x, sc->comet_y) : 8);
+						if (i <= 3)
+							skillratio += 2400 + 500 * skill_lv;
+						else if (i <= 5)
+							skillratio += 1900 + 500 * skill_lv;
+						else if (i <= 7)
+							skillratio += 1400 + 500 * skill_lv;
+						else
+							skillratio += 900 + 500 * skill_lv;
+						break;
+					case NPC_HELLBURNING:
+						skillratio += 900;
 						break;
 				}
 
