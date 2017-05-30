@@ -1944,6 +1944,9 @@ int skill_additional_effect(struct block_list* src, struct block_list *bl, uint1
 		if (skill_area_temp[3] == 1)
 			sc_start(src, bl, SC_STUN, 20, skill_lv, skill_get_time2(skill_id, skill_lv));
 		break;
+	case MER_INVINCIBLEOFF2:
+		sc_start(src, bl, SC_INVINCIBLEOFF, 100, skill_lv, skill_get_time(skill_id, skill_lv));
+		break;
 	} //end switch skill_id
 
 	if (md && battle_config.summons_trigger_autospells && md->master_id && md->special_state.ai)
@@ -3385,6 +3388,7 @@ int64 skill_attack (int attack_type, struct block_list* src, struct block_list *
 		case KO_BAKURETSU:
 		case GN_CRAZYWEED_ATK:
 		case NC_MAGMA_ERUPTION:
+		case NPC_DARKPIERCING:
 			dmg.dmotion = clif_skill_damage(src,bl,tick,dmg.amotion,dmg.dmotion,damage,dmg.div_,skill_id,-1,DMG_SPLASH);
 			break;
 		case GN_FIRE_EXPANSION_ACID:
@@ -3983,6 +3987,7 @@ static int skill_timerskill(int tid, unsigned int tick, int id, intptr_t data)
 
 			if(status_isdead(src)) {
 				switch(skl->skill_id) {
+					case NPC_DANCINGBLADE_ATK:
 					case WL_CHAINLIGHTNING_ATK:
 					case WL_TETRAVORTEX_FIRE:
 					case WL_TETRAVORTEX_WATER:
@@ -4074,6 +4079,15 @@ static int skill_timerskill(int tid, unsigned int tick, int id, intptr_t data)
 						}
 					}
 					break;
+				case NPC_DANCINGBLADE_ATK:
+					skill_attack(BF_WEAPON, src, src, target, skl->skill_id, skl->skill_lv, tick, skl->flag);
+					if (skl->type < 4) {
+						struct block_list *nbl = NULL;
+
+						nbl = battle_getenemyarea(src, target->x, target->y, 5, splash_target(src), skill_area_temp[1]);
+						skill_addtimerskill(src, tick + 651, (nbl ? nbl : target)->id, 0, 0, NPC_DANCINGBLADE_ATK, skl->skill_lv, skl->type + 1, 0);
+					}
+					break;
 				case WL_CHAINLIGHTNING_ATK: {
 						skill_attack(BF_MAGIC,src,src,target,skl->skill_id,skl->skill_lv,tick,skl->flag); // Hit a Lightning on the current Target
 						skill_toggle_magicpower(src, skl->skill_id); // Only the first hit will be amplified
@@ -4121,6 +4135,7 @@ static int skill_timerskill(int tid, unsigned int tick, int id, intptr_t data)
 					break;
 				case WM_REVERBERATION_MELEE:
 				case WM_REVERBERATION_MAGIC:
+				case NPC_PULSESTRIKE2:
 					skill_castend_damage_id(src,target,skl->skill_id,skl->skill_lv,tick,skl->flag);
 					break;
 				case SC_FATALMENACE:
@@ -4653,6 +4668,7 @@ int skill_castend_damage_id (struct block_list* src, struct block_list *bl, uint
 	case RL_MASS_SPIRAL:
 	case RL_SLUGSHOT:
 	case RL_AM_BLAST:
+	case MER_INVINCIBLEOFF2:
 		skill_attack(BF_WEAPON,src,src,bl,skill_id,skill_lv,tick,flag);
 		break;
 
@@ -4740,6 +4756,9 @@ int skill_castend_damage_id (struct block_list* src, struct block_list *bl, uint
 		}
 		break;
 
+	case NPC_DARKPIERCING:
+		clif_skill_damage(src, bl, tick, status_get_amotion(src), 0, -30000, 1, skill_id, skill_lv, DMG_SKILL);
+		//Fall through
 	case SN_SHARPSHOOTING:
 	case MA_SHARPSHOOTING:
 	case NJ_KAMAITACHI:
@@ -4878,6 +4897,7 @@ int skill_castend_damage_id (struct block_list* src, struct block_list *bl, uint
 	case GS_SPREADATTACK:
 	case NPC_EARTHQUAKE:
 	case NPC_PULSESTRIKE:
+	case NPC_PULSESTRIKE2:
 	case NPC_HELLJUDGEMENT:
 	case NPC_VAMPIRE_GIFT:
 	case NPC_MAXPAIN_ATK:
@@ -9450,7 +9470,10 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 				clif_skill_fail(sd,skill_id,USESKILL_FAIL_LEVEL,0);
 		}
 		break;
-
+	case NPC_DANCINGBLADE:
+		skill_area_temp[1] = bl->id;
+		skill_addtimerskill(src, tick + 150, bl->id, 0, 0, skill_id + 1, skill_lv, 0, 0);
+		break;
 	case WL_SUMMONFB:
 	case WL_SUMMONBL:
 	case WL_SUMMONWB:
@@ -10850,7 +10873,10 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 		else if (sd)
 			party_foreachsamemap(skill_area_sub, sd, skill_get_splash(skill_id, skill_lv), src, skill_id, skill_lv, tick, flag|BCT_PARTY|1, skill_castend_nodamage_id);
 		break;
-
+	case NPC_PULSESTRIKE2:
+		for (i = 0; i < 3; i++)
+			skill_addtimerskill(src, tick + i * 1000, bl->id, 0, 0, skill_id, skill_lv, 0, 0);
+		break;
 	default:
 		ShowWarning("skill_castend_nodamage_id: Unknown skill used:%d\n",skill_id);
 		clif_skill_nodamage(src,bl,skill_id,skill_lv,1);
@@ -11632,9 +11658,10 @@ int skill_castend_pos2(struct block_list* src, int x, int y, uint16 skill_id, ui
 #endif
 	case NPC_EVILLAND:
 	case NPC_VENOMFOG:
-	case NPC_HELLBURNING:
-	case NPC_FLAMECROSS:
+	//case NPC_COMET:
 	case NPC_ICEMINE:
+	case NPC_FLAMECROSS:
+	case NPC_HELLBURNING:
 	case RA_ELECTRICSHOCKER:
 	case RA_CLUSTERBOMB:
 	case RA_MAGENTATRAP:
@@ -20156,7 +20183,6 @@ void skill_init_unit_layout (void) {
 						memcpy(skill_unit_layout[pos].dy,dy,sizeof(dy));
 					}
 					break;
-				case NPC_FLAMECROSS:
 				case CR_GRANDCROSS:
 				case NPC_GRANDDARKNESS: {
 						static const int dx[] = {
@@ -20251,6 +20277,15 @@ void skill_init_unit_layout (void) {
 						skill_unit_layout[pos].count = 16;
 						memcpy(skill_unit_layout[pos].dx,dx,sizeof(dx));
 						memcpy(skill_unit_layout[pos].dy,dy,sizeof(dy));
+					}
+					break;
+				case NPC_FLAMECROSS: {
+						static const int dx[] = { -2, -1, 1, 2, 0, 0, 0, 0 };
+						static const int dy[] = { 0, 0, 0, 0, -2, -1, 1, 2 };
+
+						skill_unit_layout[pos].count = 8;
+						memcpy(skill_unit_layout[pos].dx, dx, sizeof(dx));
+						memcpy(skill_unit_layout[pos].dy, dy, sizeof(dy));
 					}
 					break;
 				default:

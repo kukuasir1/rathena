@@ -23205,30 +23205,30 @@ BUILDIN_FUNC(preg_match) {
 #endif
 }
 
-BUILDIN_FUNC(progressbar2)
+BUILDIN_FUNC(npcprogressbar)
 {
-	struct npc_data* nd = NULL;
-	const char * color;
+	struct block_list *bl = map_id2bl(st->oid);
+	const char *color;
 	unsigned int second;
 
-	nd = npc_name2id(script_getstr(st, 2));
-	color = script_getstr(st,3);
-	second = script_getnum(st,4);
+	color = script_getstr(st, 2);
+	second = script_getnum(st, 3);
 
-	if( !st->sleep.tick ) {
-		// sleep for the target amount of time
+	if (!st->sleep.tick) {
 		st->state = RERUNLINE;
-		st->sleep.tick = second*1000;
-		if (nd != NULL) {
-			clif_progressbar2(&nd->bl,strtol(color, (char **)NULL, 0), second);
+		st->sleep.tick = second * 1000;
+		if (script_hasdata(st, 4)) {
+			struct npc_data *nd = npc_name2id(script_getstr(st, 4));
+
+			if (nd)
+				bl = &nd->bl;
 		}
-	} else {
-		// sleep time is over
+		clif_progressbar2(bl, strtol(color, (char **)NULL, 0), second);
+	}
+	else {
 		st->state = RUN;
 		st->sleep.tick = 0;
-		script_pushint(st, (map_id2sd(st->rid)!=NULL));
 	}
-
 	return SCRIPT_CMD_SUCCESS;
 }
 
@@ -23805,7 +23805,7 @@ struct script_function buildin_func[] = {
 	BUILDIN_DEF(gvgoff3,"s"),
 
 	//kuku added
-	BUILDIN_DEF(progressbar2,"ssi"),
+	BUILDIN_DEF(npcprogressbar, "si?"),
 	BUILDIN_DEF(mobeffect,"ii"),
 
 	// Achievement System

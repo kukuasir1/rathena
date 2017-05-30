@@ -10552,8 +10552,8 @@ void clif_progressbar(struct map_session_data * sd, unsigned long color, unsigne
 
 /// Displays cast-like progress bar on an NPC.
 /// 09d1 <id>.L <color>.L <time>.L
-void clif_progressbar2(struct block_list *bl, unsigned long color, unsigned int second)
-{
+void clif_progressbar2(struct block_list *bl, unsigned long color, unsigned int second) {
+#if PACKETVER >= 20131223
 	unsigned char buf[14];
 	nullpo_retv(bl);
 
@@ -10562,7 +10562,7 @@ void clif_progressbar2(struct block_list *bl, unsigned long color, unsigned int 
 	WBUFL(buf,6) = color;
 	WBUFL(buf,10) = second;
 	clif_send(buf,packet_len(0x9d1),bl,AREA);//Length is 14
-	//clif_send(buf, 14, bl, AREA);
+#endif
 }
 
 

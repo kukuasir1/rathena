@@ -5739,6 +5739,10 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
 			case SU_SV_ROOTTWIST_ATK:
 				ad.damage = 100;
 				break;
+			case NPC_ICEMINE:
+			case NPC_FLAMECROSS:
+				ad.damage = sstatus->rhw.atk * 20 * skill_lv;
+				break;
 			default: {
 				if (sstatus->matk_max > sstatus->matk_min) {
 					MATK_ADD(sstatus->matk_min+rnd()%(sstatus->matk_max-sstatus->matk_min));
@@ -6123,8 +6127,8 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
 					case SU_CN_METEOR:
 						skillratio += 100 + 100 * skill_lv;
 						break;
-					case NPC_ICEMINE:
-					case NPC_FLAMECROSS:
+					//case NPC_ICEMINE:
+					//case NPC_FLAMECROSS:
 					case NPC_VENOMFOG:
 						skillratio += 600 + 100 * skill_lv;
 						break;
@@ -6138,6 +6142,9 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
 							skillratio += 1400 + 500 * skill_lv;
 						else
 							skillratio += 900 + 500 * skill_lv;
+						break;
+					case NPC_PULSESTRIKE2:
+						skillratio += 100;
 						break;
 					case NPC_HELLBURNING:
 						skillratio += 900;
