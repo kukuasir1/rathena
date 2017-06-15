@@ -5577,6 +5577,12 @@ enum e_setpos pc_setpos(struct map_session_data* sd, unsigned short mapindex, in
 	else 
 		sd->count_rewarp = 0;
 	
+	//reset pcblockmove and pcblockskill after warp [kuku]
+	if (sd->ud.state.blockedmove)
+		sd->ud.state.blockedmove = 0;
+	if (sd->ud.state.blockedskill)
+		sd->ud.state.blockedskill = 0;
+
 	return SETPOS_OK;
 }
 

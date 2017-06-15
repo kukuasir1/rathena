@@ -1352,8 +1352,13 @@ int unit_can_move(struct block_list *bl) {
 	if (DIFF_TICK(ud->canmove_tick, gettick()) > 0)
 		return 0;
 
-	if ((sd && (pc_issit(sd) || sd->state.vending || sd->state.buyingstore)) || ud->state.blockedmove)
+	if ((sd && (pc_issit(sd) || sd->state.vending || sd->state.buyingstore)))
 		return 0; // Can't move
+
+	if (ud->state.blockedmove) {
+		clif_msg(sd, WORK_IN_PROGRESS);
+		return 0;
+	}
 
 	// Status changes that block movement
 	if (sc) {
@@ -1501,8 +1506,10 @@ int unit_skilluse_id2(struct block_list *src, int target_id, uint16 skill_id, ui
 	if(ud == NULL)
 		return 0;
 
-	if (ud && ud->state.blockedskill)
+	if (ud && ud->state.blockedskill) {
+		clif_msg(sd, WORK_IN_PROGRESS);
 		return 0;
+	}
 
 	sc = status_get_sc(src);
 
@@ -1963,8 +1970,10 @@ int unit_skilluse_pos2( struct block_list *src, short skill_x, short skill_y, ui
 	if(ud == NULL)
 		return 0;
 
-	if (ud && ud->state.blockedskill)
+	if (ud && ud->state.blockedskill) {
+		clif_msg(sd, WORK_IN_PROGRESS);
 		return 0;
+	}
 
 	if(ud->skilltimer != INVALID_TIMER) // Normally not needed since clif.c checks for it, but at/char/script commands don't! [Skotlex]
 		return 0;
