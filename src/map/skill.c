@@ -1889,6 +1889,7 @@ int skill_additional_effect(struct block_list* src, struct block_list *bl, uint1
 					case SC_SPRITEMABLE:		case SC_BITESCAR:
 					case SC_CLAN_INFO:		case SC_SWORDCLAN:		case SC_ARCWANDCLAN:
 					case SC_GOLDENMACECLAN:	case SC_CROSSBOWCLAN:
+					case SC_DAILYSENDMAILCNT:
 						continue;
 					case SC_WHISTLE:		case SC_ASSNCROS:		case SC_POEMBRAGI:
 					case SC_APPLEIDUN:		case SC_HUMMING:		case SC_DONTFORGETME:
@@ -7963,6 +7964,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 					case SC_GOLDENMACECLAN:
 					case SC_CROSSBOWCLAN:
 					case SC_JUMPINGCLAN:
+					case SC_DAILYSENDMAILCNT:
 						continue;
 					case SC_WHISTLE:
 					case SC_ASSNCROS:
@@ -9362,6 +9364,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 					case SC_QUEST_BUFF1:	case SC_QUEST_BUFF2:	case SC_QUEST_BUFF3:
 					case SC_CLAN_INFO:		case SC_SWORDCLAN:		case SC_ARCWANDCLAN:
 					case SC_GOLDENMACECLAN:	case SC_CROSSBOWCLAN:
+					case SC_DAILYSENDMAILCNT:
 					continue;
 				case SC_ASSUMPTIO:
 					if( bl->type == BL_MOB )

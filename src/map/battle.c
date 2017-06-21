@@ -8436,8 +8436,11 @@ static const struct _battle_data {
 	{ "dispel_song",                        &battle_config.dispel_song,                     0,      0,      1,              },
 	{ "guild_maprespawn_clones",			&battle_config.guild_maprespawn_clones,			0,		0,		1,				},
 	{ "hide_fav_sell", 			&battle_config.hide_fav_sell,			0,      0,      1,              },
+	{ "mail_daily_count",					&battle_config.mail_daily_count,				100,	0,		INT32_MAX,		},
+	{ "mail_zeny_fee",						&battle_config.mail_zeny_fee,					2,		0,		100,			},
+	{ "mail_attachment_price",				&battle_config.mail_attachment_price,			2500,	0,		INT32_MAX,		},
+	{ "mail_attachment_weight",				&battle_config.mail_attachment_weight,			2000,	0,		INT32_MAX,		},
 	{ "feature.achievement",                &battle_config.feature_achievement,             1,      0,      1,              },
-
 	{ "Renewal.aspd_type",		            &battle_config.raspd_type,						1,      0,      1,              },// CRO攻速公式开关 [夜天师]
 
 #include "../custom/battle_config_init.inc"
