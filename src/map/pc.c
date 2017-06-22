@@ -8639,7 +8639,6 @@ bool pc_jobchange(struct map_session_data *sd,int job, char upper)
 	pc_equiplookall(sd);
 	pc_show_questinfo(sd);
 	achievement_update_objective(sd, AG_JOB_CHANGE, 2, sd->status.base_level, job);
-
 	if( sd->status.party_id ){
 		struct party_data* p;
 		

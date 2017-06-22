@@ -5,8 +5,9 @@
 #include "../common/cbasetypes.h"
 #include "../common/malloc.h"
 #include "../common/nullpo.h"
-#include "../common/utils.h"
 #include "../common/showmsg.h"
+#include "../common/strlib.h"
+#include "../common/utils.h"
 
 #include "achievement.h"
 #include "chrif.h"
@@ -132,7 +133,7 @@ bool achievement_remove(struct map_session_data *sd, int achievement_id)
 		memmove(&sd->achievement_data.achievements[i], &sd->achievement_data.achievements[i + 1], sizeof(struct achievement) * (sd->achievement_data.count - 1 - i));
 
 	sd->achievement_data.count--;
-	if (!sd->achievement_data.achievements[i].complete)
+	if (!sd->achievement_data.achievements[i].completed)
 		sd->achievement_data.incompleteCount--;
 	RECREATE(sd->achievement_data.achievements, struct achievement, sd->achievement_data.count);
 	sd->achievement_data.save = true;
@@ -174,7 +175,7 @@ bool achievement_check_dependent(struct map_session_data *sd, int achievement_id
 			if (adb_dep == &achievement_dummy)
 				return false;
 
-			ARR_FIND(0, sd->achievement_data.count, j, sd->achievement_data.achievements[j].achievement_id == adb->dependents[i].achievement_id && sd->achievement_data.achievements[j].complete == true);
+			ARR_FIND(0, sd->achievement_data.count, j, sd->achievement_data.achievements[j].achievement_id == adb->dependents[i].achievement_id && sd->achievement_data.achievements[j].completed > 0);
 			if (j == sd->achievement_data.count)
 				return false; // One of the dependent is not complete!
 		}
@@ -239,7 +240,7 @@ bool achievement_update_achievement(struct map_session_data *sd, int achievement
 	if (i == sd->achievement_data.incompleteCount)
 		return false;
 
-	if (sd->achievement_data.achievements[i].complete == true)
+	if (sd->achievement_data.achievements[i].completed > 0)
 		return false;
 
 	// Finally we send the updated achievement to the client
@@ -255,8 +256,7 @@ bool achievement_update_achievement(struct map_session_data *sd, int achievement
 			}
 		}
 
-		sd->achievement_data.achievements[i].complete = true;
-		sd->achievement_data.achievements[i].completeDate = time(NULL);
+		sd->achievement_data.achievements[i].completed = time(NULL);
 
 		if (i < (--sd->achievement_data.incompleteCount)) { // The achievement needs to be moved to the completed achievements block at the end of the array
 			struct achievement tmp_ach;
@@ -287,28 +287,33 @@ bool achievement_update_achievement(struct map_session_data *sd, int achievement
  * Get the reward of an achievement
  * @param sd: Player getting the reward
  * @param achievement_id: Achievement to get reward data
- * @return -2 for invalid player, -1 for invalid achievement; 0 successfully gave reward; 1 no inventory slot
  */
-int achievement_check_reward_sub(struct map_session_data *sd, int achievement_id)
+void achievement_get_reward(struct map_session_data *sd, int achievement_id, time_t rewarded)
 {
 	struct achievement_db *adb = achievement_search(achievement_id);
+	int i;
 
-	nullpo_retr(-2, sd);
+	nullpo_retv(sd);
+
+	if( rewarded == 0 ){
+		clif_achievement_reward_ack(sd->fd, 0, achievement_id);
+		return;
+	}
 
 	if (adb == &achievement_dummy) {
-		ShowError("achievement_reward: Trying to reward achievement %d not found in DB.\n", achievement_id);
-		return -1;
+		ShowError("achievement_reward: Inter server sent a reward claim for achievement %d not found in DB.\n", achievement_id);
+		return;
 	}
 
-	if (adb->rewards.nameid) { //! TODO: Change this to RODEX
-		struct item item;
+	ARR_FIND(0, sd->achievement_data.count, i, sd->achievement_data.achievements[i].achievement_id == achievement_id);
 
-		memset(&item, 0, sizeof(item));
-		item.nameid = adb->rewards.nameid;
-		item.identify = 1;
-		if (pc_additem(sd, &item, adb->rewards.amount, LOG_TYPE_MAIL) != ADDITEM_SUCCESS) // Logged as log_type mail until RODEX is implemented
-			return 1;
+	if (i == sd->achievement_data.count) {
+		return;
 	}
+
+	// Only update in the cache, db was updated already
+	sd->achievement_data.achievements[i].rewarded = rewarded;
+
 	run_script(adb->rewards.script, 0, sd->bl.id, fake_nd->bl.id);
 	if (adb->rewards.title_id) {
 		RECREATE(sd->titles, int, sd->titleCount + 1);
@@ -317,54 +322,42 @@ int achievement_check_reward_sub(struct map_session_data *sd, int achievement_id
 		sd->achievement_data.sendlist = true;
 	}
 
-	return 0;
+	clif_achievement_reward_ack(sd->fd, 1, achievement_id);
+	clif_achievement_update(sd, &sd->achievement_data.achievements[i], sd->achievement_data.count - sd->achievement_data.incompleteCount);
 }
 
 /**
  * Check if player has recieved an achievement's reward
  * @param sd: Player to get reward
  * @param achievement_id: Achievement to get reward data
- * @return False on failure, otherwise true
  */
-bool achievement_check_reward(struct map_session_data *sd, int achievement_id)
+void achievement_check_reward(struct map_session_data *sd, int achievement_id)
 {
 	int i;
+	struct achievement_db *adb = achievement_search(achievement_id);
 
-	nullpo_retr(false, sd);
+	nullpo_retv(sd);
+
+	if (adb == &achievement_dummy) {
+		ShowError("achievement_reward: Trying to reward achievement %d not found in DB.\n", achievement_id);
+		clif_achievement_reward_ack(sd->fd, 0, achievement_id);
+		return;
+	}
 
 	ARR_FIND(0, sd->achievement_data.count, i, sd->achievement_data.achievements[i].achievement_id == achievement_id);
 	if (i == sd->achievement_data.count) {
 		clif_achievement_reward_ack(sd->fd, 0, achievement_id);
-		return false;
+		return;
 	}
 
-	if (sd->achievement_data.achievements[i].gotReward == true || sd->achievement_data.achievements[i].complete == false) {
+	if (sd->achievement_data.achievements[i].rewarded > 0 || sd->achievement_data.achievements[i].completed == 0) {
 		clif_achievement_reward_ack(sd->fd, 0, achievement_id);
-		return false;
+		return;
 	}
 
-	switch(achievement_check_reward_sub(sd, achievement_id)) {
-		case 0:
-			ARR_FIND(0, sd->achievement_data.count, i, sd->achievement_data.achievements[i].achievement_id == achievement_id); // Find the achievement's index again, it may have changed
-			sd->achievement_data.achievements[i].gotReward = true;
-			intif_achievement_save(sd);
-			clif_achievement_update(sd, &sd->achievement_data.achievements[i], sd->achievement_data.count - sd->achievement_data.incompleteCount);
-			clif_achievement_reward_ack(sd->fd, 1, achievement_id);
-
-			if (sd->achievement_data.sendlist) {
-				clif_achievement_list_all(sd);
-				sd->achievement_data.sendlist = false;
-			}
-			break;
-		case 1:
-			clif_displaymessage(sd->fd, "Achievement: Please make room in your inventory before trying to receive this item.");
-			clif_achievement_reward_ack(sd->fd, 0, achievement_id);
-			return false;
-		default:
-			break;
+	if( !intif_achievement_reward(sd,adb) ){
+		clif_achievement_reward_ack(sd->fd, 0, achievement_id);
 	}
-
-	return true;
 }
 
 /**
@@ -385,7 +378,7 @@ void achievement_get_titles(uint32 char_id)
 			for (i = 0; i < sd->achievement_data.count; i++) {
 				struct achievement_db *adb = achievement_search(sd->achievement_data.achievements[i].achievement_id);
 
-				if (adb && adb->rewards.title_id && sd->achievement_data.achievements[i].complete == true) { // If the achievement has a title and is complete, give it to the player
+				if (adb && adb->rewards.title_id && sd->achievement_data.achievements[i].completed > 0) { // If the achievement has a title and is complete, give it to the player
 					RECREATE(sd->titles, int, sd->titleCount + 1);
 					sd->titles[sd->titleCount] = adb->rewards.title_id;
 					sd->titleCount++;
@@ -442,11 +435,11 @@ int achievement_check_progress(struct map_session_data *sd, int achievement_id, 
 	if (type >= ACHIEVEINFO_COUNT1 && type <= ACHIEVEINFO_COUNT10)
 		return sd->achievement_data.achievements[i].count[type - 1];
 	else if (type == ACHIEVEINFO_COMPLETE)
-		return sd->achievement_data.achievements[i].complete;
+		return sd->achievement_data.achievements[i].completed > 0;
 	else if (type == ACHIEVEINFO_COMPLETEDATE)
-		return (int)sd->achievement_data.achievements[i].completeDate;
+		return (int)sd->achievement_data.achievements[i].completed;
 	else if (type == ACHIEVEINFO_GOTREWARD)
-		return sd->achievement_data.achievements[i].gotReward;
+		return sd->achievement_data.achievements[i].rewarded > 0;
 	return -2;
 }
 
@@ -467,7 +460,7 @@ int *achievement_level(struct map_session_data *sd, bool flag)
 	old_level = sd->achievement_data.level;
 
 	for (i = 0; i < sd->achievement_data.count; i++) {
-		if (sd->achievement_data.achievements[i].complete == true)
+		if (sd->achievement_data.achievements[i].completed > 0)
 			sd->achievement_data.total_score += sd->achievement_data.achievements[i].score;
 	}
 
@@ -542,7 +535,7 @@ static int achievement_update_objectives(DBKey key, DBData *data, va_list ap)
 	} else {
 		entry = &sd->achievement_data.achievements[i];
 
-		if (entry->complete == true) // Player has completed the achievement
+		if (entry->completed > 0) // Player has completed the achievement
 			return 0;
 
 		memcpy(objective_count, entry->count, sizeof(objective_count));
@@ -984,16 +977,14 @@ struct achievement_db *achievement_read_db_sub(struct config_setting_t *cs, int 
 	struct config_setting_t *t = NULL;
 	enum e_achievement_group group = AG_NONE;
 	int score = 0, achievement_id = 0;
-	const char *group_char = NULL;
-	const char *condition = NULL;
-	const char *mapname = NULL;
+	const char *group_char = NULL, *name = NULL, *condition = NULL, *mapname = NULL;
 
 	if (!config_setting_lookup_int(cs, "id", &achievement_id)) {
 		ShowWarning("achievement_read_db_sub: Missing ID in \"%s\", entry #%d, skipping.\n", source, n);
 		return NULL;
 	}
 	if (achievement_id < 1 || achievement_id >= INT_MAX) {
-		ShowWarning("achievement_read_db_sub: Invalid achievement ID '%d' in \"%s\", entry #%d (min: 0, max: %d), skipping.\n", achievement_id, source, n, INT_MAX);
+		ShowWarning("achievement_read_db_sub: Invalid achievement ID %d in \"%s\", entry #%d (min: 1, max: %d), skipping.\n", achievement_id, source, n, INT_MAX);
 		return NULL;
 	}
 	if (!config_setting_lookup_string(cs, "group", &group_char) || !*group_char) {
@@ -1005,9 +996,15 @@ struct achievement_db *achievement_read_db_sub(struct config_setting_t *cs, int 
 		return NULL;
 	}
 
+	if (!config_setting_lookup_string(cs, "name", &name) || !*name) {
+		ShowWarning("achievement_read_db_sub: Missing achievement name for achievement %d in \"%s\", skipping.\n", name, achievement_id, source);
+		return NULL;
+	}
+
 	CREATE(entry, struct achievement_db, 1);
 	entry->achievement_id = achievement_id;
 	entry->group = group;
+	safestrncpy(entry->name, name, sizeof(entry->name));
 	entry->mapindex = -1;
 
 	if ((t = config_setting_get_member(cs, "target")) && config_setting_is_list(t)) {
@@ -1113,43 +1110,58 @@ struct achievement_db *achievement_read_db_sub(struct config_setting_t *cs, int 
 
 /**
  * Loads achievements from the achievement db.
- * @return Number of loaded achievements, or -1 if the file couldn't be read.
  */
-int achievement_read_db(void)
+void achievement_read_db(void)
 {
-	char filepath[256];
 	struct config_setting_t *adb = NULL, *a = NULL;
-	int count = 0;
-	const char *filename = "achievement_db.conf";
+	int i = 0;
+	const char *dbsubpath[] = {
+		"",
+		"/"DBIMPORT"/",
+		//add other path here
+	};
 
-	sprintf(filepath, "%s/%s", db_path, filename);
-	if (config_read_file(&achievement_db_conf, filepath))
-		return -1;
+	for (i = 0; i < ARRAYLENGTH(dbsubpath); i++) {
+		char filepath[256];
+		int count = 0;
 
-	if ((adb = config_lookup(&achievement_db_conf, "achievement_db")) == NULL) {
-		ShowError("Failed to read '%s'.\n", filepath);
-		return -1;
-	}
+		if (!i)
+			sprintf(filepath, "%s/%s%s%s", db_path, DBPATH, dbsubpath[i], "achievement_db.conf");
+		else
+			sprintf(filepath, "%s%s%s", db_path, dbsubpath[i], "achievement_db.conf");
 
-	while ((a = config_setting_get_elem(adb, count))) {
-		struct achievement_db *entry = achievement_read_db_sub(a, count, filepath);
+		if (config_read_file(&achievement_db_conf, filepath))
+			continue;
 
-		if (!entry) {
-			ShowWarning("achievement_read_db: Failed to parse achievement entry %d.\n", count);
+		if ((adb = config_lookup(&achievement_db_conf, "achievement_db")) == NULL) {
+			ShowError("Failed to read '%s'.\n", filepath);
 			continue;
 		}
-		if (achievement_search(entry->achievement_id) != &achievement_dummy) {
-			ShowWarning("achievement_read_db: Duplicate achievement %d.\n", entry->achievement_id);
-			achievement_db_free_sub(entry, false);
-			continue;
+
+		while ((a = config_setting_get_elem(adb, count))) {
+			struct achievement_db *duplicate = &achievement_dummy, *entry = achievement_read_db_sub(a, count, filepath);
+
+			if (!entry) {
+				ShowWarning("achievement_read_db: Failed to parse achievement entry %d.\n", count);
+				continue;
+			}
+			if ((duplicate = achievement_search(entry->achievement_id)) != &achievement_dummy) {
+				if (!i) { // Normal file read-in
+					ShowWarning("achievement_read_db: Duplicate achievement %d.\n", entry->achievement_id);
+					achievement_db_free_sub(entry, false);
+					continue;
+				} else // Import file read-in, free previous value and store new value
+					achievement_db_free_sub(duplicate, false);
+			}
+			idb_put(achievement_db, entry->achievement_id, entry);
+			count++;
 		}
-		idb_put(achievement_db, entry->achievement_id, entry);
-		count++;
+
+		ShowStatus("Done reading '"CL_WHITE"%d"CL_RESET"' entries in '"CL_WHITE"%s"CL_RESET"'.\n", count, filepath);
 	}
 
-	ShowStatus("Done reading '"CL_WHITE"%d"CL_RESET"' entries in '"CL_WHITE"%s"CL_RESET"'.\n", count, filename);
 	config_destroy(&achievement_db_conf);
-	return count;
+	return;
 }
 
 /**

@@ -33,10 +33,10 @@ static const int packet_len_table[] = {
 	 0, 0, 0, 0,  0, 0, 0, 0, -1,11, 0, 0,  0, 0,  0, 0, //0x3810
 	39,-1,15,15, 15+NAME_LENGTH,19, 7,-1,  0, 0, 0, 0,  0, 0,  0, 0, //0x3820
 	10,-1,15, 0, 79,19, 7,-1,  0,-1,-1,-1, 14,67,186,-1, //0x3830
-
 	-1, 0, 0,14,  0, 0, 0, 0, -1,75,-1,11, 11,-1, 38, 0, //0x3840
 	-1,-1, 7, 7,  7,11, 8,-1,  0, 0, 0, 0,  0, 0,  0, 0, //0x3850  Auctions [Zephyrus] / itembound[Akinari]
-	-1, 7,-1, 7,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0,  0, 0, //0x3860  Quests [Kevin] [Inkfish] / Achievements [Aleos]
+
+	-1, 7,-1, 7, 14, 0, 0, 0,  0, 0, 0, 0,  0, 0,  0, 0, //0x3860  Quests [Kevin] [Inkfish] / Achievements [Aleos]
 	-1, 3, 3, 0,  0, 0, 0, 0,  0, 0, 0, 0, -1, 3,  3, 0, //0x3870  Mercenaries [Zephyrus] / Elemental [pakpil]
 	12,-1, 7, 3,  0, 0, 0, 0,  0, 0,-1, 9, -1, 0,  0, 0, //0x3880  Pet System,  Storages
 	-1,-1, 7, 3,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0,  0, 0, //0x3890  Homunculus [albator]
@@ -2133,7 +2133,7 @@ void intif_parse_achievements(int fd)
 
 			received[i].score = adb->score;
 
-			if (received[i].complete == false) // Insert at the beginning
+			if (received[i].completed == 0) // Insert at the beginning
 				memcpy(&sd->achievement_data.achievements[sd->achievement_data.incompleteCount++], &received[i], sizeof(struct achievement));
 			else // Insert at the end
 				memcpy(&sd->achievement_data.achievements[--k], &received[i], sizeof(struct achievement));
@@ -2191,6 +2191,43 @@ int intif_achievement_save(struct map_session_data *sd)
 	WFIFOSET(inter_fd, len);
 
 	sd->achievement_data.save = false;
+
+	return 1;
+}
+
+/**
+ * Parses the reply of the reward claiming for a achievement from the inter server.
+ * @see intif_parse
+ * @param fd : char-serv link
+ */
+void intif_parse_achievementreward(int fd){
+	struct map_session_data *sd = map_charid2sd(RFIFOL(fd,2));
+
+	// User not online anymore
+	if( !sd ){
+		return;
+	}
+
+	achievement_get_reward(sd, RFIFOL(fd, 6), RFIFOL(fd, 10));
+}
+
+/**
+ * Request the achievement rewards from the inter server.
+ */
+int intif_achievement_reward(struct map_session_data *sd, struct achievement_db *adb){
+	if( CheckForCharServer() ){
+		return 0;
+	}
+
+	WFIFOHEAD(inter_fd, 16+NAME_LENGTH+ACHIEVEMENT_NAME_LENGTH);
+	WFIFOW(inter_fd, 0) = 0x3064;
+	WFIFOL(inter_fd, 2) = sd->status.char_id;
+	WFIFOL(inter_fd, 6) = adb->achievement_id;
+	WFIFOW(inter_fd, 10) = adb->rewards.nameid;
+	WFIFOL(inter_fd, 12) = adb->rewards.amount;
+	safestrncpy(WFIFOCP(inter_fd, 16), sd->status.name, NAME_LENGTH);
+	safestrncpy(WFIFOCP(inter_fd, 16+NAME_LENGTH), adb->name, ACHIEVEMENT_NAME_LENGTH);
+	WFIFOSET(inter_fd, 16+NAME_LENGTH+ACHIEVEMENT_NAME_LENGTH);
 
 	return 1;
 }
@@ -3723,6 +3760,7 @@ int intif_parse(int fd)
 	//Achievement system
 	case 0x3862:	intif_parse_achievements(fd); break;
 	case 0x3863:	intif_parse_achievementsave(fd); break;
+	case 0x3864:	intif_parse_achievementreward(fd); break;
 
 	// Mercenary System
 	case 0x3870:	intif_parse_mercenary_received(fd); break;

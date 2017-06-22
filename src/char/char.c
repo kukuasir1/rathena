@@ -960,7 +960,7 @@ int char_mmo_chars_fromsql(struct char_session_data* sd, uint8* buf) {
 	||	SQL_ERROR == SqlStmt_BindColumn(stmt, 40, SQLDT_UINT,   &p.uniqueitem_counter, 0, NULL, NULL)
 	||	SQL_ERROR == SqlStmt_BindColumn(stmt, 41, SQLDT_ENUM,   &sex, sizeof(sex), NULL, NULL)
 	||	SQL_ERROR == SqlStmt_BindColumn(stmt, 42, SQLDT_UCHAR,   &p.hotkey_rowshift, 0, NULL, NULL)
-	||	SQL_ERROR == SqlStmt_BindColumn(stmt, 42, SQLDT_ULONG,	&p.title_id, 0, NULL, NULL)
+	||	SQL_ERROR == SqlStmt_BindColumn(stmt, 43, SQLDT_ULONG,	&p.title_id, 0, NULL, NULL)
 	)
 	{
 		SqlStmt_ShowDebug(stmt);
@@ -2482,7 +2482,7 @@ bool char_checkdb(void){
 		return false;
 	}
 	//checking achievement_table
-	if (SQL_ERROR == Sql_Query(sql_handle, "SELECT `char_id`,`id`,`complete`,`count1`,`count2`,`count3`,`count4`,`count5`,`count6`,`count7`,`count8`,`count9`,`count10`,`completeDate`,`gotReward`"
+	if (SQL_ERROR == Sql_Query(sql_handle, "SELECT `char_id`,`id`,`count1`,`count2`,`count3`,`count4`,`count5`,`count6`,`count7`,`count8`,`count9`,`count10`,`completed`,`rewarded`"
 		" FROM `%s` LIMIT 1;", schema_config.achievement_table)) {
 		Sql_ShowDebug(sql_handle);
 		return false;

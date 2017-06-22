@@ -4,9 +4,8 @@
 #ifndef MAP_ACHIEVEMENTS_H
 #define MAP_ACHIEVEMENTS_H
 
+#include "../common/mmo.h"
 #include "../common/db.h"
-
-#define MAX_ACHIEVEMENT_RANK 20 /// Maximum achievement level
 
 enum e_achievement_group {
 	AG_NONE = 0,
@@ -77,6 +76,7 @@ struct av_condition {
 
 struct achievement_db {
 	int achievement_id;
+	char name[ACHIEVEMENT_NAME_LENGTH];
 	enum e_achievement_group group;
 	uint8 target_count;
 	struct achievement_target *targets;
@@ -102,18 +102,18 @@ struct achievement_db achievement_dummy;	///< Dummy entry for invalid achievemen
 
 struct achievement_db *achievement_search(int achievement_id);
 bool achievement_mobexists(int mob_id);
-int achievement_check_reward_sub(struct map_session_data *sd, int achievement_id);
+void achievement_get_reward(struct map_session_data *sd, int achievement_id, time_t rewarded);
 struct achievement *achievement_add(struct map_session_data *sd, int achievement_id);
 bool achievement_remove(struct map_session_data *sd, int achievement_id);
 bool achievement_update_achievement(struct map_session_data *sd, int achievement_id, bool complete);
-bool achievement_check_reward(struct map_session_data *sd, int achievement_id);
+void achievement_check_reward(struct map_session_data *sd, int achievement_id);
 void achievement_free(struct map_session_data *sd);
 int achievement_check_progress(struct map_session_data *sd, int achievement_id, int type);
 int *achievement_level(struct map_session_data *sd, bool flag);
 void achievement_get_titles(uint32 char_id);
 struct achievement_db *achievement_read_db_sub(struct config_setting_t *cs, int n, const char *source);
 void achievement_update_objective(struct map_session_data *sd, enum e_achievement_group group, uint8 arg_count, ...);
-int achievement_read_db(void);
+void achievement_read_db(void);
 void achievement_db_reload(void);
 
 void do_init_achievement(void);
