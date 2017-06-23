@@ -622,6 +622,7 @@ extern struct Battle_Config
 	int mail_zeny_fee;
 	int mail_attachment_price;
 	int mail_attachment_weight;
+	int banana_bomb_duration;
 	int feature_achievement;
 	int raspd_type;                         // CRO攻速公式开关 [夜天师]
 
