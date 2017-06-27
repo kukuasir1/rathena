@@ -8516,7 +8516,8 @@ BUILDIN_FUNC(strnpcinfo)
 			name = aStrdup(nd->exname);
 			break;
 		case 4: // map name
-			name = aStrdup(map[nd->bl.m].name);
+			if (nd->bl.m >= 0)
+				name = aStrdup(map[nd->bl.m].name);
 			break;
 	}
 
