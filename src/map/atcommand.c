@@ -9850,7 +9850,6 @@ ACMD_FUNC(cloneequip) {
 */
 ACMD_FUNC(clonestat) {
 	struct map_session_data *pl_sd;
-	uint32 char_id = 0;
 
 	nullpo_retr(-1, sd);
 
