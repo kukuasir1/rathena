@@ -134,7 +134,13 @@
     <ClInclude Include="clan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="achievement.h">
+    <ClInclude Include="clif_obfuscation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clif_packetdb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clif_shuffle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
