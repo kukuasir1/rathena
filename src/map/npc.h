@@ -139,6 +139,9 @@ enum npce_event {
 	NPCE_KILLPC,
 	NPCE_KILLNPC,
 	NPCE_STATCALC,
+#ifdef kuku_Event_Extend
+	NPCE_KILLMVP, // 杀死MVP魔物时的事件
+#endif
 	NPCE_MAX
 };
 struct view_data* npc_get_viewdata(int class_);

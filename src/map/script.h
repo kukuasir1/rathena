@@ -204,6 +204,11 @@ extern struct Script_Config {
 	// Instance related
 	const char* instance_init_event_name;
 	const char* instance_destroy_event_name;
+
+#ifdef kuku_Event_Extend
+	const char* kill_mvp_mob_event_name;	// 杀死MVP魔物时的事件
+#endif
+
 } script_config;
 
 typedef enum c_op {

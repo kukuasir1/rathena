@@ -4454,6 +4454,9 @@ void npc_read_event_script(void)
 		{"Kill PC Event",script_config.kill_pc_event_name},
 		{"Kill NPC Event",script_config.kill_mob_event_name},
 		{"Stat Calc Event",script_config.stat_calc_event_name},
+#ifdef kuku_Event_Extend
+		{ "Kill MVP Mob Event", script_config.kill_mvp_mob_event_name }, // 杀死MVP魔物时的事件
+#endif
 	};
 
 	for (i = 0; i < NPCE_MAX; i++)

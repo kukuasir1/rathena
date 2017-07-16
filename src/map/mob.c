@@ -2928,6 +2928,17 @@ int mob_dead(struct mob_data *md, struct block_list *src, int type)
 			pc_setparam(mvp_sd, SP_KILLEDRID, md->mob_id);
 			npc_script_event(mvp_sd, NPCE_KILLNPC); // PCKillNPC [Lance]
 		}
+#ifdef kuku_Event_Extend
+		// 如果杀死的是MVP魔物，那么触发一下事件 [Sola丶小克]
+		if (sd && mvp_sd && status && status->mode&MD_STATUS_IMMUNE && md && md->db->mexp > 0){
+			ShowWarning("is mvp");
+			pc_setparam(mvp_sd, SP_KILLERRID, mvp_sd->status.char_id);
+			pc_setparam(mvp_sd, SP_KILLEDRID, md->mob_id);
+			pc_setreg(mvp_sd, add_str("@mob_dead_x"), (int)md->bl.x);
+			pc_setreg(mvp_sd, add_str("@mob_dead_y"), (int)md->bl.y);
+			npc_script_event(mvp_sd, NPCE_KILLMVP);
+		}
+#endif
 	}
 
 	if(md->deletetimer != INVALID_TIMER) {

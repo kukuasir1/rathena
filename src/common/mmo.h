@@ -51,6 +51,9 @@
 	#define MAX_HOTKEYS 38
 #endif
 
+// 是否扩展事件
+#define kuku_Event_Extend
+
 #define MAX_MAP_PER_SERVER 1500 /// Increased to allow creation of Instance Maps
 #define MAX_INVENTORY 100 ///Maximum items in player inventory
 /** Max number of characters per account. Note that changing this setting alone is not enough if the client is not hexed to support more characters as well.

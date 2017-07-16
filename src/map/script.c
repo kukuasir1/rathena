@@ -255,6 +255,9 @@ struct Script_Config script_config = {
 	"OnTouch_",	//ontouch_event_name (runs on first visible char to enter area, picks another char if the first char leaves)
 	"OnTouch",	//ontouch2_event_name (run whenever a char walks into the OnTouch area)
 	"OnTouchNPC", //ontouchnpc_event_name (run whenever a monster walks into the OnTouch area)
+#ifdef kuku_Event_Extend
+	"OnMvpKillEvent",			// kill_mvp_mob_event_name		// 杀死MVP魔物时的事件
+#endif
 	"OnWhisperGlobal",	//onwhisper_event_name (is executed when a player sends a whisper message to the NPC)
 	"OnCommand", //oncommand_event_name (is executed by script command cmdothernpc)
 	// Init related
