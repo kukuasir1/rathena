@@ -162,7 +162,9 @@ extern struct Script_Config {
 	const char *baselvup_event_name;
 	const char *joblvup_event_name;
 	const char *stat_calc_event_name;
-
+#ifdef kuku_Event_Extend
+	const char* kill_mvp_mob_event_name;	// 杀死MVP魔物时的事件
+#endif
 	// NPC related
 	const char* ontouch_event_name;
 	const char* ontouch2_event_name;
@@ -204,10 +206,6 @@ extern struct Script_Config {
 	// Instance related
 	const char* instance_init_event_name;
 	const char* instance_destroy_event_name;
-
-#ifdef kuku_Event_Extend
-	const char* kill_mvp_mob_event_name;	// 杀死MVP魔物时的事件
-#endif
 
 } script_config;
 

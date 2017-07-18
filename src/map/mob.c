@@ -2929,14 +2929,17 @@ int mob_dead(struct mob_data *md, struct block_list *src, int type)
 			npc_script_event(mvp_sd, NPCE_KILLNPC); // PCKillNPC [Lance]
 		}
 #ifdef kuku_Event_Extend
-		// 如果杀死的是MVP魔物，那么触发一下事件 [Sola丶小克]
-		if (sd && mvp_sd && status && status->mode&MD_STATUS_IMMUNE && md && md->db->mexp > 0){
-			ShowWarning("is mvp");
-			pc_setparam(mvp_sd, SP_KILLERRID, mvp_sd->status.char_id);
-			pc_setparam(mvp_sd, SP_KILLEDRID, md->mob_id);
-			pc_setreg(mvp_sd, add_str("@mob_dead_x"), (int)md->bl.x);
-			pc_setreg(mvp_sd, add_str("@mob_dead_y"), (int)md->bl.y);
-			npc_script_event(mvp_sd, NPCE_KILLMVP);
+		// 如果杀死的是MVP魔物，那么触发一下OnMvpKillEvent事件
+		// 此事件由给予魔物最多伤害的玩家执行(MVP玩家) [Sola丶小克]
+		if (sd && md && status && status_has_mode(status, MD_MVP)) {
+			pc_setparam(sd, SP_KILLEDRID, md->mob_id);
+			pc_setreg(sd, add_str("@mob_dead_x"), (int)md->bl.x);
+			pc_setreg(sd, add_str("@mob_dead_y"), (int)md->bl.y);
+			pc_setreg(sd, add_str("@mob_lasthit_rid"), (int)sd->bl.id);
+			pc_setreg(sd, add_str("@mob_lasthit_cid"), (int)sd->status.char_id);
+			pc_setreg(sd, add_str("@mob_mvp_rid"), (int)mvp_sd ? sd->bl.id : 0);
+			pc_setreg(sd, add_str("@mob_mvp_cid"), (int)mvp_sd ? sd->status.char_id : 0);
+			npc_script_event(sd, NPCE_KILLMVP);
 		}
 #endif
 	}
