@@ -1058,9 +1058,6 @@ void clif_achievement_update(struct map_session_data *sd, struct achievement *ac
 void clif_pAchievementCheckReward(int fd, struct map_session_data *sd);
 void clif_achievement_reward_ack(int fd, unsigned char result, int ach_id);
 
-//npc progressbar (by kuku)
-void clif_progressbar2(struct block_list *bl, unsigned long color, unsigned int second);
-
 #ifdef __cplusplus
 }
 #endif

@@ -23417,34 +23417,8 @@ BUILDIN_FUNC(preg_match) {
 #endif
 }
 
-BUILDIN_FUNC(npcprogressbar)
-{
-	struct block_list *bl = map_id2bl(st->oid);
-	const char *color;
-	unsigned int second;
 
-	color = script_getstr(st, 2);
-	second = script_getnum(st, 3);
-
-	if (!st->sleep.tick) {
-		st->state = RERUNLINE;
-		st->sleep.tick = second * 1000;
-		if (script_hasdata(st, 4)) {
-			struct npc_data *nd = npc_name2id(script_getstr(st, 4));
-
-			if (nd)
-				bl = &nd->bl;
-		}
-		clif_progressbar2(bl, strtol(color, (char **)NULL, 0), second);
-	}
-	else {
-		st->state = RUN;
-		st->sleep.tick = 0;
-	}
-	return SCRIPT_CMD_SUCCESS;
-}
-
-//mobeffect <GID>,<effect_type>;
+//mobeffect <GID>,<effect_type>; [kuku]
 BUILDIN_FUNC(mobeffect) {
 	int type = script_getnum(st,3);
 	struct block_list *bl = map_id2bl(script_getnum(st,2));
@@ -24019,7 +23993,6 @@ struct script_function buildin_func[] = {
 	BUILDIN_DEF(gvgoff3,"s"),
 
 	//kuku added
-	BUILDIN_DEF(npcprogressbar, "si?"),
 	BUILDIN_DEF(mobeffect,"ii"),
 	// Channel System
 	BUILDIN_DEF(channel_create,"ss?????"),

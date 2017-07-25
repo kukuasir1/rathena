@@ -2185,7 +2185,6 @@
 	packet(0x09DC,-1); // ZC_NOTIFY_NEWENTRY10
 	packet(0x09DD,-1); // ZC_NOTIFY_STANDENTRY10
 	packet(0x09DF,7); // ZC_ACK_WHISPER02
-	packet(0x09D1, 14); //npc_progressbar [kuku]
 #endif
 
 // 2014-10-16Ragexe
