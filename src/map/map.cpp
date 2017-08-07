@@ -124,9 +124,9 @@ int map_port=0;
 int autosave_interval = DEFAULT_AUTOSAVE_INTERVAL;
 int minsave_interval = 100;
 unsigned char save_settings = CHARSAVE_ALL;
-bool agit_flag = false;
-bool agit2_flag = false;
-bool agit3_flag = false;
+int agit_flag = false;
+int agit2_flag = false;
+int agit3_flag = false;
 int night_flag = 0; // 0=day, 1=night [Yor]
 
 #ifdef ADJUST_SKILL_DAMAGE

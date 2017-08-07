@@ -753,9 +753,9 @@ extern int night_flag; // 0=day, 1=night [Yor]
 extern int enable_spy; //Determines if @spy commands are active.
 
 // Agit Flags
-extern bool agit_flag;
-extern bool agit2_flag;
-extern bool agit3_flag;
+extern int agit_flag;
+extern int agit2_flag;
+extern int agit3_flag;
 #define is_agit_start() (agit_flag || agit2_flag || agit3_flag)
 
 extern char motd_txt[];
