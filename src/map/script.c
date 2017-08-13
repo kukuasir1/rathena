@@ -5626,13 +5626,6 @@ BUILDIN_FUNC(return)
 					get_val(st, data); // current scope, convert to value
 				if( data->ref && data->ref->vars == st->stack->stack_data[st->stack->defsp-1].u.ri->scope.vars )
 					data->ref = NULL; // Reference to the parent scope, remove reference pointer
-			} else if( name[0] == '.' && !data->ref ) { // script variable, link to current script
-				data->ref = (struct reg_db *)aCalloc(sizeof(struct reg_db), 1);
-				data->ref->vars = st->script->local.vars;
-
-				if (!st->script->local.arrays)
-					st->script->local.arrays = idb_alloc(DB_OPT_BASE);
-				data->ref->arrays = st->script->local.arrays;
 			}
 		}
 	}
@@ -17772,6 +17765,23 @@ BUILDIN_FUNC(setunitdata)
 			md->base_status = (struct status_data*)aCalloc(1, sizeof(struct status_data));
 			memcpy(md->base_status, &md->db->status, sizeof(struct status_data));
 		}
+
+		// Check if the view data will be modified
+		switch( type ){
+			case UMOB_SEX:
+			//case UMOB_CLASS: // Called by status_set_viewdata
+			case UMOB_HAIRSTYLE:
+			case UMOB_HAIRCOLOR:
+			case UMOB_HEADBOTTOM:
+			case UMOB_HEADMIDDLE:
+			case UMOB_HEADTOP:
+			case UMOB_CLOTHCOLOR:
+			case UMOB_SHIELD:
+			case UMOB_WEAPON:
+				mob_set_dynamic_viewdata( md );
+				break;
+		}
+
 		switch (type) {
 			case UMOB_SIZE: md->base_status->size = (unsigned char)value; calc_status = true; break;
 			case UMOB_LEVEL: md->level = (unsigned short)value; break;
@@ -17785,8 +17795,8 @@ BUILDIN_FUNC(setunitdata)
 			case UMOB_MODE: md->base_status->mode = (enum e_mode)value; calc_status = true; break;
 			case UMOB_AI: md->special_state.ai = (enum mob_ai)value; break;
 			case UMOB_SCOPTION: md->sc.option = (unsigned short)value; break;
-			case UMOB_SEX: md->vd->sex = (char)value; break;
-			case UMOB_CLASS: status_set_viewdata(bl, (unsigned short)value); break;
+			case UMOB_SEX: md->vd->sex = (char)value; clif_clearunit_area(bl, CLR_OUTSIGHT); clif_spawn(bl); break;
+			case UMOB_CLASS: status_set_viewdata(bl, (unsigned short)value); clif_clearunit_area(bl, CLR_OUTSIGHT); clif_spawn(bl); break;
 			case UMOB_HAIRSTYLE: clif_changelook(bl, LOOK_HAIR, (unsigned short)value); break;
 			case UMOB_HAIRCOLOR: clif_changelook(bl, LOOK_HAIR_COLOR, (unsigned short)value); break;
 			case UMOB_HEADBOTTOM: clif_changelook(bl, LOOK_HEAD_BOTTOM, (unsigned short)value); break;
