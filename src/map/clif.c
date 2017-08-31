@@ -15629,13 +15629,17 @@ void clif_parse_Mail_setattach(int fd, struct map_session_data *sd){
 /// 0a07 <result>.B <index>.W <amount>.W <weight>.W
 void clif_mail_removeitem( struct map_session_data* sd, bool success, int index, int amount ){
 	int fd = sd->fd;
+	int i,total = 0;
 
 	WFIFOHEAD(fd, 9);
 	WFIFOW(fd, 0) = 0xa07;
 	WFIFOB(fd, 2) = success;
 	WFIFOW(fd, 3) = index;
 	WFIFOW(fd, 5) = amount;
-	WFIFOW(fd, 7) = 0; // TODO: which weight? item weight? removed weight? remaining weight?
+	//kuku
+	for (i = 0; i < MAIL_MAX_ITEM; i++)
+		total += sd->mail.item[i].amount * (sd->inventory_data[sd->mail.item[i].index]->weight / 10);
+	WFIFOW(fd, 7) = total;
 	WFIFOSET(fd, 9);
 }
 
