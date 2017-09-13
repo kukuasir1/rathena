@@ -630,8 +630,9 @@ extern struct Battle_Config
 	int guild_leaderchange_delay;
 	int guild_leaderchange_woe;
 	int guild_alliance_onlygm;
-	int feature_achievement;
 	int raspd_type;                         // CRO攻速公式开关 [夜天师]
+	int feature_achievement;
+	int allow_bound_sell;
 
 #include "../custom/battle_config_struct.inc"
 } battle_config;

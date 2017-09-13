@@ -8457,8 +8457,9 @@ static const struct _battle_data {
 	{ "guild_leaderchange_delay",			&battle_config.guild_leaderchange_delay,		1440,	0,		INT32_MAX,		},
 	{ "guild_leaderchange_woe",				&battle_config.guild_leaderchange_woe,			0,		0,		1,				},
 	{ "guild_alliance_onlygm",              &battle_config.guild_alliance_onlygm,           0,      0,      1, },
-	{ "feature.achievement",                &battle_config.feature_achievement,             1,      0,      1,              },
 	{ "Renewal.aspd_type",		            &battle_config.raspd_type,						1,      0,      1,              },// CRO攻速公式开关 [夜天师]
+	{ "feature.achievement",                &battle_config.feature_achievement,             1,      0,      1,              },
+	{ "allow_bound_sell",                   &battle_config.allow_bound_sell,                1,      0,      1,              },
 
 #include "../custom/battle_config_init.inc"
 };
