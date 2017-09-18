@@ -232,8 +232,9 @@ void initChangeTables(void)
 	set_sc( NPC_BLEEDING		, SC_BLEEDING		, SI_BLEEDING		, SCB_REGEN );
 	set_sc( NPC_POISON		, SC_DPOISON		, SI_BLANK		, SCB_DEF2|SCB_REGEN );
 	add_sc( ALL_REVERSEORCISH,	SC_ORCISH );
-	set_sc( NPC_WIDEWEB			, SC_SPIDERWEB		, SI_WIDEWEB		, SCB_FLEE );
+	set_sc( NPC_WIDEWEB			, SC_WIDEWEB		, SI_WIDEWEB	, SCB_FLEE);
 	set_sc( NPC_COMET			, SC_BURNING		, SI_BURNT		, SCB_MDEF);
+	set_sc(	NPC_FIRESTORM		, SC_BURNT		, SI_BURNT		, SCB_ALL);
 
 	/* The main status definitions */
 	add_sc( SM_BASH			, SC_STUN		);
@@ -533,7 +534,7 @@ void initChangeTables(void)
 	add_sc( NPC_WIDESTUN		, SC_STUN		);
 
 	set_sc_with_vfx( NPC_WIDESUCK	, SC_BLOODSUCKER	, SI_BLOODSUCKER		, SCB_NONE );
-	add_sc( NPC_WIDEWEB			, SC_SPIDERWEB );
+	//add_sc( NPC_WIDEWEB			, SC_SPIDERWEB );
 	set_sc( NPC_HELLPOWER		, SC_HELLPOWER		, SI_HELLPOWER		, SCB_NONE );
 	set_sc( NPC_WIDEHELLDIGNITY	, SC_HELLPOWER		, SI_HELLPOWER		, SCB_NONE );
 	set_sc( NPC_INVINCIBLE		, SC_INVINCIBLE		, SI_INVINCIBLE		, SCB_SPEED );
@@ -1107,6 +1108,9 @@ void initChangeTables(void)
 	StatusIconChangeTable[SC_DORAM_BUF_01] = SI_DORAM_BUF_01;
 	StatusIconChangeTable[SC_DORAM_BUF_02] = SI_DORAM_BUF_02;
 
+	//kuku
+	StatusIconChangeTable[SC_CHILL] = SI_CHILL;
+
 	// Item Reuse Limits
 	StatusIconChangeTable[SC_REUSE_REFRESH] = SI_REUSE_REFRESH;
 	StatusIconChangeTable[SC_REUSE_LIMIT_A] = SI_REUSE_LIMIT_A;
@@ -1368,6 +1372,7 @@ void initChangeTables(void)
 	StatusChangeStateTable[SC_BLADESTOP_WAIT]		|= SCS_NOMOVE;
 	StatusChangeStateTable[SC_GOSPEL]				|= SCS_NOMOVE|SCS_NOMOVECOND;
 	StatusChangeStateTable[SC_BASILICA]				|= SCS_NOMOVE|SCS_NOMOVECOND;
+	StatusChangeStateTable[SC_WIDEWEB]				|= SCS_NOMOVE;
 	StatusChangeStateTable[SC_STOP]					|= SCS_NOMOVE;
 	StatusChangeStateTable[SC_CLOSECONFINE]			|= SCS_NOMOVE;
 	StatusChangeStateTable[SC_CLOSECONFINE2]		|= SCS_NOMOVE;
@@ -4166,6 +4171,10 @@ int status_calc_pc_(struct map_session_data* sd, enum e_status_calc_opt opt)
 			sd->magic_addele[ELE_WIND] += 25;
 		if( sc->data[SC_EARTH_INSIGNIA] && sc->data[SC_EARTH_INSIGNIA]->val1 == 3 )
 			sd->magic_addele[ELE_EARTH] += 25;
+		if (sc->data[SC_BURNT]) {
+			sd->subdefele[ELE_FIRE] -= 400;
+			sd->subele[ELE_FIRE] -= 400;
+		}
 	}
 	status_cpy(&sd->battle_status, base_status);
 
@@ -6246,7 +6255,7 @@ static signed short status_calc_flee(struct block_list *bl, struct status_change
 	// Rate value
 	if(sc->data[SC_INCFLEERATE])
 		flee += flee * sc->data[SC_INCFLEERATE]->val1/100;
-	if(sc->data[SC_SPIDERWEB])
+	if (sc->data[SC_SPIDERWEB] || sc->data[SC_WIDEWEB])
 		flee -= flee * 50/100;
 	if(sc->data[SC_BERSERK])
 		flee -= flee * 50/100;
@@ -8772,6 +8781,10 @@ int status_change_start(struct block_list* src, struct block_list* bl,enum sc_ty
 		if (sc->data[SC_DEVOTION] || sc->data[SC_WHITEIMPRISON])
 			return 0;
 		break;
+	case SC_BURNT:
+		if (sc->data[SC_CHILL])
+			return 0;
+		break;
 	case SC_GROOMING:
 	case SC_CHATTERING:
 		if (sc->data[type])
@@ -9172,6 +9185,9 @@ int status_change_start(struct block_list* src, struct block_list* bl,enum sc_ty
 	case SC_KAAHI:
 		//These status changes always overwrite themselves even when a lower level is cast
 		status_change_end(bl, type, INVALID_TIMER);
+		break;
+	case SC_CHILL:
+		status_change_end(bl, SC_BURNT, INVALID_TIMER);
 		break;
 	}
 
@@ -10905,6 +10921,7 @@ int status_change_start(struct block_list* src, struct block_list* bl,enum sc_ty
 			val3 = val1 * 25; // -movespeed (custom)
 			break;
 		case SC_C_MARKER:
+		case SC_BURNT:
 			// val1 = skill_lv
 			// val2 = src_id
 			val3 = 10; // -10 flee
@@ -11222,6 +11239,7 @@ int status_change_start(struct block_list* src, struct block_list* bl,enum sc_ty
 		// Fall through
 		case SC_ANKLE:
 		case SC_SPIDERWEB:
+		case SC_WIDEWEB:
 		case SC_ELECTRICSHOCKER:
 		case SC_MAGNETICFIELD:
 		case SC_NETHERWORLD:
@@ -13486,6 +13504,21 @@ int status_change_timer(int tid, unsigned int tick, int id, intptr_t data)
 			if( status->sp < status->max_sp )
 				status_heal(bl, 0, 5, 2);
 			sc_timer_next(10000 + tick, status_change_timer, bl->id, data);
+			return 0;
+		}
+		break;
+	case SC_BURNT:
+		if (sd && --(sce->val4) >= 0) {
+			int damage = 2000;
+
+			if (damage >= status->hp)
+				damage = status->hp - 1;
+			map_freeblock_lock();
+			status_zap(bl, damage, 0);
+			if (sc->data[type]) {
+				sc_timer_next(1000 + tick, status_change_timer, bl->id, data);
+			}
+			map_freeblock_unlock();
 			return 0;
 		}
 		break;

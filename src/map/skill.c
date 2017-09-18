@@ -1513,6 +1513,9 @@ int skill_additional_effect(struct block_list* src, struct block_list *bl, uint1
 	case WL_CRIMSONROCK:
 		sc_start(src,bl, SC_STUN, 40, skill_lv, skill_get_time(skill_id, skill_lv));
 		break;
+	case NPC_FIRESTORM:
+		sc_start(src, bl, SC_BURNT, 100, skill_lv, skill_get_time(skill_id, skill_lv));
+		break;
 	case NPC_COMET:
 	case WL_COMET:
 		sc_start4(src,bl,SC_BURNING,100,skill_lv,1000,src->id,0,skill_get_time(skill_id,skill_lv));
@@ -1884,7 +1887,8 @@ int skill_additional_effect(struct block_list* src, struct block_list *bl, uint1
 					case SC_SPRITEMABLE:		case SC_BITESCAR:
 					case SC_CLAN_INFO:		case SC_SWORDCLAN:		case SC_ARCWANDCLAN:
 					case SC_GOLDENMACECLAN:	case SC_CROSSBOWCLAN:
-					case SC_DAILYSENDMAILCNT:
+					case SC_DAILYSENDMAILCNT:	case SC_WIDEWEB:		case SC_CHILL:
+					case SC_BURNT:
 						continue;
 					case SC_WHISTLE:		case SC_ASSNCROS:		case SC_POEMBRAGI:
 					case SC_APPLEIDUN:		case SC_HUMMING:		case SC_DONTFORGETME:
@@ -5213,6 +5217,7 @@ int skill_castend_damage_id (struct block_list* src, struct block_list *bl, uint
 	case AL_HEAL:
 	case AL_HOLYLIGHT:
 	case NPC_DARKTHUNDER:
+	case NPC_FIRESTORM:
 	case PR_ASPERSIO:
 	case MG_FROSTDIVER:
 	case WZ_SIGHTBLASTER:
@@ -7974,6 +7979,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 					case SC_SPRITEMABLE:		case SC_BITESCAR:	case SC_CRUSHSTRIKE:
 					case SC_QUEST_BUFF1:	case SC_QUEST_BUFF2:	case SC_QUEST_BUFF3:
 					case SC_ARMOR_ELEMENT_EARTH:	case SC_ARMOR_ELEMENT_FIRE:	case SC_ARMOR_ELEMENT_WIND:
+					case SC_WIDEWEB:		case SC_CHILL:			case SC_BURNT:
 					// Clans
 					case SC_CLAN_INFO:
 					case SC_SWORDCLAN:
@@ -8979,6 +8985,16 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 				skill_castend_nodamage_id);
 		}
 		break;
+	case NPC_FIRESTORM:{
+		int sflag = flag;
+
+		if (skill_lv > 1)
+			sflag |= 4;
+		clif_skill_nodamage(src, bl, skill_id, skill_lv, 1);
+		map_foreachinshootrange(skill_area_sub, src, skill_get_splash(skill_id, skill_lv), splash_target(src), src,
+			skill_id, skill_lv, tick, sflag | BCT_ENEMY | SD_ANIMATION | 1, skill_castend_damage_id);
+		}
+		break;
 	case ALL_PARTYFLEE:
 		if( sd  && !(flag&1) ) {
 			if( !sd->status.party_id ) {
@@ -9382,7 +9398,8 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 					case SC_QUEST_BUFF1:	case SC_QUEST_BUFF2:	case SC_QUEST_BUFF3:
 					case SC_CLAN_INFO:		case SC_SWORDCLAN:		case SC_ARCWANDCLAN:
 					case SC_GOLDENMACECLAN:	case SC_CROSSBOWCLAN:
-					case SC_DAILYSENDMAILCNT:
+					case SC_DAILYSENDMAILCNT:	case SC_WIDEWEB:	case SC_CHILL:
+					case SC_BURNT:
 					continue;
 				case SC_ASSUMPTIO:
 					if( bl->type == BL_MOB )

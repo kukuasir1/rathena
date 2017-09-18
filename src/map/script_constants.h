@@ -1469,6 +1469,9 @@
 	export_constant(SC_DAILYSENDMAILCNT);
 	export_constant(SC_DORAM_BUF_01);
 	export_constant(SC_DORAM_BUF_02);
+	export_constant(SC_WIDEWEB);
+	export_constant(SC_CHILL);
+	export_constant(SC_BURNT);
 	export_constant(SC_HISS);
 	export_constant(SC_NYANGGRASS);
 	export_constant(SC_GROOMING);

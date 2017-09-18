@@ -491,6 +491,10 @@ int64 battle_attr_fix(struct block_list *src, struct block_list *target, int64 d
 					//Remove a unit group or end whole status change
 					status_change_end(target, SC_SPIDERWEB, INVALID_TIMER);
 				}
+				if (tsc->data[SC_WIDEWEB]) {
+					damage *= 2;
+					status_change_end(target, SC_WIDEWEB, INVALID_TIMER);
+				}
 				if (tsc->data[SC_THORNSTRAP] && battle_getcurrentskill(src) != GN_CARTCANNON)
 					status_change_end(target, SC_THORNSTRAP, INVALID_TIMER);
 				if (tsc->data[SC_CRYSTALIZE])
@@ -6160,6 +6164,9 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
 						break;
 					case NPC_HELLBURNING:
 						skillratio += 900;
+						break;
+					case NPC_FIRESTORM:
+						skillratio += 200;
 						break;
 				}
 

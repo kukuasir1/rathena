@@ -806,6 +806,10 @@ typedef enum sc_type {
 
 	SC_DORAM_BUF_01,
 	SC_DORAM_BUF_02,
+	//kuku
+	SC_WIDEWEB,
+	SC_CHILL,
+	SC_BURNT,
 
 	/**
 	 * Summoner - Extended
