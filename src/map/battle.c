@@ -8467,6 +8467,7 @@ static const struct _battle_data {
 	{ "Renewal.aspd_type",		            &battle_config.raspd_type,						1,      0,      1,              },// CRO攻速公式开关 [夜天师]
 	{ "feature.achievement",                &battle_config.feature_achievement,             1,      0,      1,              },
 	{ "allow_bound_sell",                   &battle_config.allow_bound_sell,                1,      0,      1,              },
+	{ "event_refine_chance",                &battle_config.event_refine_chance,             0,      0,      1,              },
 
 #include "../custom/battle_config_init.inc"
 };
