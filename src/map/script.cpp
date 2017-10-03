@@ -10189,7 +10189,7 @@ BUILDIN_FUNC(monster)
 	int amount			= script_getnum(st,7);
 	const char* event	= "";
 	unsigned int size	= SZ_SMALL;
-	unsigned int ai		= AI_NONE;
+	enum mob_ai ai		= AI_NONE;
 
 	struct map_session_data* sd;
 	int16 m;
@@ -10209,7 +10209,7 @@ BUILDIN_FUNC(monster)
 	}
 
 	if (script_hasdata(st, 10)) {
-		ai = script_getnum(st, 10);
+		ai = static_cast<enum mob_ai>(script_getnum(st, 10));
 		if (ai >= AI_MAX) {
 			ShowWarning("buildin_monster: Attempted to spawn non-existing ai %d for monster class %d\n", ai, class_);
 			return SCRIPT_CMD_FAILURE;
@@ -10290,7 +10290,7 @@ BUILDIN_FUNC(areamonster)
 	int amount			= script_getnum(st,9);
 	const char* event	= "";
 	unsigned int size	= SZ_SMALL;
-	unsigned int ai		= AI_NONE;
+	enum mob_ai ai		= AI_NONE;
 
 	struct map_session_data* sd;
 	int16 m;
@@ -10310,7 +10310,7 @@ BUILDIN_FUNC(areamonster)
 	}
 
 	if (script_hasdata(st, 12)) {
-		ai = script_getnum(st, 12);
+		ai = static_cast<enum mob_ai>(script_getnum(st, 12));
 		if (ai >= AI_MAX) {
 			ShowWarning("buildin_monster: Attempted to spawn non-existing ai %d for monster class %d\n", ai, class_);
 			return SCRIPT_CMD_FAILURE;
