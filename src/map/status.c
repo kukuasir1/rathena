@@ -891,6 +891,8 @@ void initChangeTables(void)
 	add_sc( SU_MEOWMEOW				, SC_CHATTERING );
 	set_sc( SU_CHATTERING			, SC_CHATTERING		, SI_CHATTERING		, SCB_WATK|SCB_MATK );
 
+	set_sc( WE_CHEERUP				, SC_CHEERUP		, SI_CHEERUP		, SCB_STR|SCB_AGI|SCB_VIT|SCB_INT|SCB_DEX|SCB_LUK );
+
 	/* Storing the target job rather than simply SC_SPIRIT simplifies code later on */
 	SkillStatusChangeTable[skill_get_index(SL_ALCHEMIST)]	= (sc_type)MAPID_ALCHEMIST,
 	SkillStatusChangeTable[skill_get_index(SL_MONK)]		= (sc_type)MAPID_MONK,
@@ -1696,7 +1698,7 @@ int status_damage(struct block_list *src,struct block_list *target,int64 dhp, in
 				* Endure count is only reduced by non-players on non-gvg maps.
 				* val4 signals infinite endure.
 				**/
-				if (src && src->type != BL_PC && !map_flag_gvg2(target->m) && !map[target->m].flag.battleground && --(sce->val2) < 0)
+				if (src && src->type != BL_PC && !map_flag_gvg2(target->m) && !map[target->m].flag.battleground && --(sce->val2) <= 0)
 					status_change_end(target, SC_ENDURE, INVALID_TIMER);
 			}
 			if ((sce=sc->data[SC_GRAVITATION]) && sce->val3 == BCT_SELF) {
@@ -5453,6 +5455,8 @@ static unsigned short status_calc_str(struct block_list *bl, struct status_chang
 		str += 1;
 	if(sc->data[SC_FULL_THROTTLE])
 		str += str * sc->data[SC_FULL_THROTTLE]->val3 / 100;
+	if(sc->data[SC_CHEERUP])
+		str += 3;
 
 	return (unsigned short)cap_value(str,0,USHRT_MAX);
 }
@@ -5525,6 +5529,8 @@ static unsigned short status_calc_agi(struct block_list *bl, struct status_chang
 		agi += agi * sc->data[SC_FULL_THROTTLE]->val3 / 100;
 	if (sc->data[SC_ARCLOUSEDASH])
 		agi += sc->data[SC_ARCLOUSEDASH]->val2;
+	if(sc->data[SC_CHEERUP])
+		agi += 3;
 
 	return (unsigned short)cap_value(agi,0,USHRT_MAX);
 }
@@ -5589,6 +5595,8 @@ static unsigned short status_calc_vit(struct block_list *bl, struct status_chang
 	if(sc->data[SC_DEFENCE])
 		vit += sc->data[SC_DEFENCE]->val2;
 #endif
+	if(sc->data[SC_CHEERUP])
+		vit += 3;
 
 	return (unsigned short)cap_value(vit,0,USHRT_MAX);
 }
@@ -5659,6 +5667,8 @@ static unsigned short status_calc_int(struct block_list *bl, struct status_chang
 		int_ += 1;
 	if(sc->data[SC_FULL_THROTTLE])
 		int_ += int_ * sc->data[SC_FULL_THROTTLE]->val3 / 100;
+	if(sc->data[SC_CHEERUP])
+		int_ += 3;
 
 	if(bl->type != BL_PC) {
 		if(sc->data[SC_STRIPHELM])
@@ -5740,6 +5750,8 @@ static unsigned short status_calc_dex(struct block_list *bl, struct status_chang
 		dex -= dex * sc->data[SC_MARSHOFABYSS]->val2 / 100;
 	if(sc->data[SC_FULL_THROTTLE])
 		dex += dex * sc->data[SC_FULL_THROTTLE]->val3 / 100;
+	if(sc->data[SC_CHEERUP])
+		dex += 3;
 
 	return (unsigned short)cap_value(dex,0,USHRT_MAX);
 }
@@ -5802,6 +5814,8 @@ static unsigned short status_calc_luk(struct block_list *bl, struct status_chang
 		luk += 1;
 	if(sc->data[SC_FULL_THROTTLE])
 		luk += luk * sc->data[SC_FULL_THROTTLE]->val3 / 100;
+	if(sc->data[SC_CHEERUP])
+		luk += 3;
 
 	return (unsigned short)cap_value(luk,0,USHRT_MAX);
 }
