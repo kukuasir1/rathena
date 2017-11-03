@@ -5140,14 +5140,14 @@ void status_calc_bl_main(struct block_list *bl, /*enum scb_flag*/int flag)
 					renewal_aspd = 0.0;
 
 				renewal_aspd = 200.0 - ( 200.0 - (BaseAspd - Correction + sqrt( status->agi * 9.999 + status->dex * 0.19212 ) * Penalty));
-				renewal_aspd += (status_calc_aspd(bl, sc, 1)/40.0)*(200.0-renewal_aspd);
+				renewal_aspd += (status_calc_aspd(bl, sc, true)/40.0)*(200.0-renewal_aspd);
 				renewal_aspd += bonus;
 
 				amotion = status_base_amotion_pc(sd,status) - ((int) ((renewal_aspd - BaseAspd) * 10));
 
-				if( (status_calc_aspd(bl, sc, 2) + status->aspd_rate2) != 0 ) // RE ASPD percertage modifier
+				if ((status_calc_aspd(bl, sc, false) + status->aspd_rate2) != 0) // RE ASPD percertage modifier
 					amotion -= ( amotion - ((sd->class_&JOBL_THIRD) ? battle_config.max_third_aspd : battle_config.max_aspd) )
-								* (status_calc_aspd(bl, sc, 2) + status->aspd_rate2) / 100;
+								* (status_calc_aspd(bl, sc, false) + status->aspd_rate2) / 100;
 			}
 			//END- CRO攻速公式开关 [夜天师]
 			if(status->aspd_rate != 1000) // Absolute percentage modifier
