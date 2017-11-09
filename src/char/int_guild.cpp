@@ -19,7 +19,6 @@
 #include "char_mapif.hpp"
 #include "inter.hpp"
 
-
 #define GS_MEMBER_UNMODIFIED 0x00
 #define GS_MEMBER_MODIFIED 0x01
 #define GS_MEMBER_NEW 0x02
@@ -733,7 +732,7 @@ int inter_guild_sql_init(void)
 
 	//Read exp file
 	for(i = 0; i<ARRAYLENGTH(filename); i++){
-		sv_readdb(db_path, filename[i], ',', 1, 1, 100, exp_guild_parse_row, i);
+		sv_readdb(db_path, filename[i], ',', 1, 1, 100, exp_guild_parse_row, i > 0);
 	}
 
 	add_timer_func_list(guild_save_timer, "guild_save_timer");

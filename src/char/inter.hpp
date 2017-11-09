@@ -1,18 +1,15 @@
 // Copyright (c) Athena Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
-#ifndef _INTER_SQL_H_
-#define _INTER_SQL_H_
+#ifndef _INTER_HPP_
+#define _INTER_HPP_
 
 #include "../common/cbasetypes.h"
-//#include "../common/conf.h"
-//#include "../common/mmo.h"
 #include "../common/sql.h"
 
 #include <memory>
 #include <string>
 #include <unordered_map>
-
 
 struct s_storage_table;
 struct Inter_Config {
@@ -31,7 +28,7 @@ void mapif_accinfo_ack(bool success, int map_fd, int u_fd, int u_aid, int accoun
 	int group_id, int logincount, int state, const char *email, const char *last_ip, const char *lastlogin,
 	const char *birthdate, const char *user_pass, const char *pincode, const char *userid);
 
-int inter_log(char *fmt,...);
+int inter_log(const char *fmt,...);
 
 #define inter_cfgName "conf/inter_athena.conf"
 
@@ -43,5 +40,4 @@ extern Sql* lsql_handle;
 void inter_savereg(uint32 account_id, uint32 char_id, const char *key, unsigned int index, intptr_t val, bool is_string);
 int inter_accreg_fromsql(uint32 account_id, uint32 char_id, int fd, int type);
 
-
-#endif /* _INTER_SQL_H_ */
+#endif /* _INTER_HPP_ */
