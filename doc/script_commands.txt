@@ -9643,7 +9643,6 @@ If <char id> is specified, the specified player is used rather than the attached
 
 ---------------------------------------
 
-
 ========================
 |14.- Channel commands.|
 ========================

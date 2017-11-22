@@ -268,8 +268,5 @@
     <ClCompile Include="vending.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="achievement.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>
