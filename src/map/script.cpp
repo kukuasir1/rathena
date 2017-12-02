@@ -23728,19 +23728,6 @@ BUILDIN_FUNC(preg_match) {
 #endif
 }
 
-
-//mobeffect <GID>,<effect_type>; [kuku]
-BUILDIN_FUNC(mobeffect) {
-	int type = script_getnum(st,3);
-	struct block_list *bl = map_id2bl(script_getnum(st,2));
-	if (bl) {
-		clif_specialeffect(bl,type,AREA);
-	}
-	return SCRIPT_CMD_SUCCESS;
-}
-
-
-
 /// script command definitions
 /// for an explanation on args, see add_buildin_func
 struct script_function buildin_func[] = {
@@ -24304,8 +24291,6 @@ struct script_function buildin_func[] = {
 	BUILDIN_DEF(gvgon3,"s"),
 	BUILDIN_DEF(gvgoff3,"s"),
 
-	//kuku added
-	BUILDIN_DEF(mobeffect,"ii"),
 	// Channel System
 	BUILDIN_DEF(channel_create,"ss?????"),
 	BUILDIN_DEF(channel_setopt,"sii"),

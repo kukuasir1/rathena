@@ -2388,7 +2388,7 @@ int status_base_amotion_pc(struct map_session_data* sd, struct status_data* stat
 	// Percentual delay reduction from stats
 	amotion -= amotion * (4*status->agi + status->dex)/1000;
 #endif
-	if (!battle_config.raspd_type) // CRO攻速公式开关 [夜天师]
+	if (!battle_config.re_aspd_type) // CRO攻速公式开关 [夜天师]
 
 	// Raw delay adjustment from bAspd bonus
 		amotion += sd->bonus.aspd_add;
@@ -5123,8 +5123,7 @@ void status_calc_bl_main(struct block_list *bl, /*enum scb_flag*/int flag)
 			if(status->aspd_rate != 1000)
 				amotion = amotion*status->aspd_rate/1000;
 #else
-			if (!battle_config.raspd_type)// CRO攻速公式开关 [夜天师]
-			{
+			if (!battle_config.re_aspd_type) { // CRO攻速公式开关 [夜天师]
 				/// aspd = baseaspd + floor(sqrt((agi^2/2) + (dex^2/5))/4 + (potskillbonus*agi/200))
 				amotion -= (int)(sqrt( (pow(status->agi, 2) / 2) + (pow(status->dex, 2) / 5) ) / 4 + (status_calc_aspd(bl, sc, true) * status->agi / 200)) * 10;
 

@@ -11,3 +11,5 @@
  *	 { "name", &battle_config.<variable name>, <default value>, <minimum value>, <maximum value> },
  **/
 
+	{ "renewal.aspd_type",		            &battle_config.re_aspd_type,						1,      0,      1,              },// CRO攻速公式开关 [夜天师]
+

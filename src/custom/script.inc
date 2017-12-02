@@ -17,3 +17,13 @@
 //	script_pushint(st,1);
 //	return 0;
 //}
+
+//mobeffect <GID>,<effect_type>; [kuku]
+BUILDIN_FUNC(mobeffect) {
+	int type = script_getnum(st,3);
+	struct block_list *bl = map_id2bl(script_getnum(st,2));
+	if (bl) {
+		clif_specialeffect(bl,type,AREA);
+	}
+	return SCRIPT_CMD_SUCCESS;
+}
