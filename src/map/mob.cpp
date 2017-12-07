@@ -2874,10 +2874,13 @@ int mob_dead(struct mob_data *md, struct block_list *src, int type)
 
 		mexp = (unsigned int)cap_value(exp, 1, UINT_MAX);
 
-		clif_mvp_effect(mvp_sd);
-		clif_mvp_exp(mvp_sd,mexp);
-		pc_gainexp(mvp_sd, &md->bl, mexp,0, 0);
-		log_mvp[1] = mexp;
+		//正常情况下type&1和type&2同时存在时为killmonster或自杀[kuku]
+		if (type != 3) {
+			clif_mvp_effect(mvp_sd);
+			clif_mvp_exp(mvp_sd, mexp);
+			pc_gainexp(mvp_sd, &md->bl, mexp, 0, 0);
+			log_mvp[1] = mexp;
+		}
 
 		if( !(map[m].flag.nomvploot || type&1) ) {
 			//Order might be random depending on item_drop_mvp_mode config setting

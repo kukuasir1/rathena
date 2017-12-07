@@ -1,4 +1,4 @@
-// Copyright (c) Athena Dev Teams - Licensed under GNU GPL
+﻿// Copyright (c) Athena Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
 /**
@@ -11,3 +11,7 @@
 //BUILDIN_DEF(example,""),
 
 BUILDIN_DEF(mobeffect,"ii"), //[kuku]
+BUILDIN_DEF(unitremove, "i?"),//[╰づ记忆•斑驳〤]
+BUILDIN_DEF2(getareagid, "getareagid", "siiiii"),//[╰づ记忆•斑驳〤]
+BUILDIN_DEF2(getareagid, "getareagid", "siiii"),//[╰づ记忆•斑驳〤]
+BUILDIN_DEF2(getareagid, "getareagid", "si"),//[╰づ记忆•斑驳〤]

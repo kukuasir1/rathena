@@ -10353,10 +10353,10 @@ BUILDIN_FUNC(areamonster)
 
 	if(!allflag){
 		if(strcmp(event,md->npc_event)==0)
-			unit_free(bl,CLR_DEAD);
+			status_kill(bl);
 	}else{
 		if(!md->spawn)
-			unit_free(bl,CLR_DEAD);
+			status_kill(bl);
 	}
 	md->state.npc_killmonster = 0;
 	return SCRIPT_CMD_SUCCESS;
@@ -10370,10 +10370,10 @@ static int buildin_killmonster_sub(struct block_list *bl,va_list ap)
 
 	if(!allflag){
 		if(strcmp(event,md->npc_event)==0)
-			unit_free(bl,CLR_DEAD);
+			status_kill(bl);
 	}else{
 		if(!md->spawn)
-			unit_free(bl,CLR_DEAD);
+			status_kill(bl);
 	}
 	return SCRIPT_CMD_SUCCESS;
 }
@@ -10413,12 +10413,12 @@ static int buildin_killmonsterall_sub_strip(struct block_list *bl,va_list ap)
 	if (md->npc_event[0])
 		md->npc_event[0] = 0;
 
-	unit_free(bl,CLR_DEAD);
+	status_kill(bl);
 	return 0;
 }
 static int buildin_killmonsterall_sub(struct block_list *bl,va_list ap)
 {
-	unit_free(bl,CLR_DEAD);
+	status_kill(bl);
 	return 0;
 }
 BUILDIN_FUNC(killmonsterall)
