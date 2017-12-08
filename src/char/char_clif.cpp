@@ -764,7 +764,8 @@ int chclif_parse_req_charlist(int fd, struct char_session_data* sd){
 	if( RFIFOREST(fd) < 2 )
 		return 0;
 	RFIFOSKIP(fd,2);
-	chclif_mmo_send099d(fd,sd);
+	// 修正人物选择界面地图名显示不正确的bug, 此封包根本没用 [kuku]
+	//chclif_mmo_send099d(fd,sd);
 	return 1;
 }
 
