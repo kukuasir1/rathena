@@ -18,73 +18,93 @@
 //	return 0;
 //}
 
-//mobeffect <GID>,<effect_type>; [kuku]
-BUILDIN_FUNC(mobeffect) {
-	int type = script_getnum(st,3);
-	struct block_list *bl = map_id2bl(script_getnum(st,2));
-	if (bl) {
-		clif_specialeffect(bl,type,AREA);
-	}
+/*
+* 根据GID让指定对象显示effect [kuku]
+* uniteffect <GID>,<effect number>{,<send_target>}
+*/
+BUILDIN_FUNC(uniteffect) {
+	struct block_list* bl;
+	//effect编号
+	int type = script_getnum(st, 3);
+	//发送目标,默认为AREA
+	enum send_target target = script_hasdata(st, 4) ? (send_target)script_getnum(st, 4) : AREA;
+	//根据参数GID获取bl
+	if (script_rid2bl(2, bl))
+		clif_specialeffect(bl, type, target);
 	return SCRIPT_CMD_SUCCESS;
 }
 
-//根据gid删除对象
-// unitremove <GID>{,<Type>};
-// type:
-// CLR_OUTSIGHT / CLR_DEAD / CLR_RESPAWN / CLR_TELEPORT / CLR_TRICKDEAD
-// type:
-//    0 = out of sight
-//    1 = died
-//    2 = logged out
-//    3 = teleport
-//    4 = trickdead
+/*根据gid删除对象
+* unitremove <GID>{,<Type>};
+* type:
+* CLR_OUTSIGHT / CLR_DEAD / CLR_RESPAWN / CLR_TELEPORT / CLR_TRICKDEAD
+* type:
+*    0 = out of sight
+*    1 = died
+*    2 = logged out
+*    3 = teleport
+*    4 = trickdead
+*/
 BUILDIN_FUNC(unitremove)
 {
 	struct block_list *bl;
-	int gid, type;
+	int type;
 	enum clr_type clrtype;
 
-	gid = script_getnum(st, 2);
-	bl = map_id2bl(gid);
-
-	if (bl == NULL)
+	//根据第一个参数GID获取bl
+	if (!script_rid2bl(2, bl))
+		//如果bl不存在跳出
 		return SCRIPT_CMD_SUCCESS;
 
-	type = script_hasdata(st, 3) ? script_getnum(st, 3) : CLR_OUTSIGHT;
+	//判断是否有第2个参数<Type>,有就是用参数,没有就用0
+	type = script_hasdata(st, 3) ? script_getnum(st, 3) : 0;
+	//如果使用错误的type则强制用0
 	if (type < 0 || type > 4) type = 0;
-	clrtype = (enum clr_type)(type);
+	//强制转换成clr_type
+	clrtype = (enum clr_type)type;
 
+	//根据clrtype显示消失的效果
 	clif_clearunit_area(bl, clrtype);
 
+	//根据bl的类型进行判断
 	switch (bl->type) {
-	case BL_PC:
+	case BL_PC: //人物
+		//人物断线
 		map_quit((struct map_session_data *) bl);
 		break;
-	case BL_MOB:
+	case BL_MOB: //怪物
+		//怪物释放
 		unit_free(bl, CLR_OUTSIGHT);
 		break;
-	case BL_ITEM:
+	case BL_ITEM: //道具
+		//清除掉落地面的指定道具
 		map_clearflooritem(bl);
 		break;
-	case BL_NPC:
+	case BL_NPC: //NPC
+		//卸载NPC
 		npc_unload((struct npc_data *)bl, true);
 		break;
-	case BL_SKILL:
+	case BL_SKILL: //技能
+		//移除指定技能对象
 		skill_delunit((struct skill_unit *) bl);
 		break;
-	case BL_MER:
+	case BL_MER: //佣兵
+		//删除佣兵
 		mercenary_delete((struct mercenary_data *) bl, 1);
 		break;
-	case BL_PET:
+	case BL_PET: //宠物
+		//还原为宠物蛋
 		pet_menu(((struct pet_data *)bl)->master, 3);
 		break;
-	case BL_ELEM:
+	case BL_ELEM: //元素
+		//移除指定对象
 		elemental_delete((struct elemental_data *)bl);
 		break;
-	case BL_HOM:
+	case BL_HOM: //生命体
+		//删除生命体
 		hom_menu(((struct homun_data *)bl)->master, 2);
 		break;
-	default:
+	default: //其它类型则报错
 		ShowError("buildin_unitremove: Do not support remove this block, type: '%d'. \n", bl->type);
 		return SCRIPT_CMD_FAILURE;
 	}
@@ -92,51 +112,60 @@ BUILDIN_FUNC(unitremove)
 }
 
 
+/* 获得指定区域内的所有GID
+* getareagid("<地图名>",<类型>,<x0>,<y0>,<x1>,<y1>,<arrayname>);
+* getareagid("<地图名>",<类型>,<中心坐标x>,<中心坐标y>,<半径>,<arrayname>);
+* getareagid("<地图名>",<类型>,<arrayname>);
+*		第一种方法为获取区域内 GID；
+*		第二种方法为获取中心坐标周围的 GID；
+*		第三种方法为获取地图上的 GID；
+*
+*		当地图名为 Location 时，为玩家所在地图，此时必须有关联玩家。
+*		类型：BL_PC
+*			  BL_MOB
+*			  BL_PET
+*			  BL_HOM
+*			  BL_MER
+*			  BL_ITEM
+*			  BL_SKILL
+*			  BL_NPC
+*			  BL_CHAT
+*			  BL_ELEM
+*
+*		返回 -2 为没找到地图
+*		返回 -1 指定地图为 Location 但是没有关联玩家
+*		返回 0  没找到相关类型的实体
+*		返回 >0 为找到的相关数量
+*
+*		如果找到了相关实体，数组将会保存在 $@areagid 中
+*/
 static int buildin_getareagid_sub(struct block_list *bl, va_list ap)
 {
+	struct map_session_data *sd = (TBL_PC *)bl;
+	struct script_state *st = va_arg(ap, struct script_state *);
+	char *varname = va_arg(ap, char *);
 	int *count = va_arg(ap, int *);
-	mapreg_setreg(reference_uid(add_str("$@areagid"), (*count)), bl->id);
+	setd_sub(st, sd, varname, *count, (void *)__64BPRTSIZE(bl->id), NULL);
 	(*count)++;
 	return 0;
 }
 
-
-//*getareagid("<地图名>",<类型>,<x0>,<y0>,<x1>,<y1>);
-//*getareagid("<地图名>",<类型>,<中心坐标x>,<中心坐标y>,<半径>);
-//*getareagid("<地图名>",<类型>);
-//		第一种方法为获取区域内 GID；
-//		第二种方法为获取中心坐标周围的 GID；
-//		第三种方法为获取地图上的 GID；
-//
-//		当地图名为 Location 时，为玩家所在地图，此时必须有关联玩家。
-//		类型：BL_PC
-//			  BL_MOB
-//			  BL_PET
-//			  BL_HOM
-//			  BL_MER
-//			  BL_ITEM
-//			  BL_SKILL
-//			  BL_NPC
-//			  BL_CHAT
-//			  BL_ELEM
-//
-//		返回 -2 为没找到地图
-//		返回 -1 指定地图为 Location 但是没有关联玩家
-//		返回 0  没找到相关类型的实体
-//		返回 >0 为找到的相关数量
-//		
-//		如果找到了相关实体，数组将会保存在 $@areagid 中
 BUILDIN_FUNC(getareagid)
 {
 	int map_id, type, count;
 	const char* mapname = NULL;
+	char* varname = NULL;
+	struct script_data *data = NULL;
+
 	type = script_getnum(st, 3);
 	mapname = script_getstr(st, 2);
 
 	if (strcmp(mapname, "this") == 0) {
 		TBL_PC *sd;
-		if (!script_rid2sd(sd))
+		if (!script_rid2sd(sd)) {
+			script_pushint(st, -1);
 			return SCRIPT_CMD_SUCCESS;
+		}
 		map_id = map_mapindex2mapid(sd->mapindex);
 	}
 	else
@@ -146,27 +175,35 @@ BUILDIN_FUNC(getareagid)
 		script_pushint(st, -2);
 		return SCRIPT_CMD_SUCCESS;
 	}
+
+	data = script_getdata(st, script_lastdata(st));
+	if (!data_isreference(data)) {
+		ShowWarning("buildin_getareagid: Error in argument! Please give a variable to store values in.\n");
+		return SCRIPT_CMD_FAILURE;
+	}
+	varname = reference_getname(data);
+
 	count = 0;
-	if (script_hasdata(st, 7)) {
+	if (script_hasdata(st, 8)) {
 		int x0, y0, x1, y1;
 		x0 = script_getnum(st, 4);
 		y0 = script_getnum(st, 5);
 		x1 = script_getnum(st, 6);
 		y1 = script_getnum(st, 7);
-		map_foreachinarea(buildin_getareagid_sub, map_id, x0, y0, x1, y1, type, &count);
+		map_foreachinarea(buildin_getareagid_sub, map_id, x0, y0, x1, y1, type, st, varname, &count);
 	}
 	else {
 		struct block_list center;
 		int range;
-		if (script_hasdata(st, 6)) {
+		if (script_hasdata(st, 7)) {
 			center.m = map_id;
 			center.x = script_getnum(st, 4);
 			center.y = script_getnum(st, 5);
 			range = script_getnum(st, 6);
-			map_foreachinrange(buildin_getareagid_sub, &center, range, type, &count);
+			map_foreachinrange(buildin_getareagid_sub, &center, range, type, st, varname, &count);
 		}
 		else {
-			map_foreachinmap(buildin_getareagid_sub, map_id, type, &count);
+			map_foreachinmap(buildin_getareagid_sub, map_id, type, st, varname, &count);
 		}
 	}
 	script_pushint(st, count);

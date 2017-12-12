@@ -10,8 +10,9 @@
 
 //BUILDIN_DEF(example,""),
 
-BUILDIN_DEF(mobeffect,"ii"), //[kuku]
+BUILDIN_DEF(uniteffect,"ii?"), //[kuku]
+BUILDIN_DEF2(uniteffect,"mobeffect","ii?"), //kuku
 BUILDIN_DEF(unitremove, "i?"),//[╰づ记忆•斑驳〤]
-BUILDIN_DEF2(getareagid, "getareagid", "siiiii"),//[╰づ记忆•斑驳〤]
-BUILDIN_DEF2(getareagid, "getareagid", "siiii"),//[╰づ记忆•斑驳〤]
-BUILDIN_DEF2(getareagid, "getareagid", "si"),//[╰づ记忆•斑驳〤]
+BUILDIN_DEF2(getareagid, "getareagid", "siiiii*"),//[╰づ记忆•斑驳〤]
+BUILDIN_DEF2(getareagid, "getareagid", "siiii*"),//[╰づ记忆•斑驳〤]
+BUILDIN_DEF2(getareagid, "getareagid", "si*"),//[╰づ记忆•斑驳〤]
