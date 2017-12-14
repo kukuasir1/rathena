@@ -141,9 +141,10 @@ BUILDIN_FUNC(unitremove)
 */
 static int buildin_getareagid_sub(struct block_list *bl, va_list ap)
 {
-	struct map_session_data *sd = (TBL_PC *)bl;
+	//参数要按顺序读取
 	struct script_state *st = va_arg(ap, struct script_state *);
-	char *varname = va_arg(ap, char *);
+	struct map_session_data *sd = va_arg(ap, struct map_session_data *);
+	const char *varname = va_arg(ap,const char *);
 	int *count = va_arg(ap, int *);
 	setd_sub(st, sd, varname, *count, (void *)__64BPRTSIZE(bl->id), NULL);
 	(*count)++;
@@ -153,59 +154,68 @@ static int buildin_getareagid_sub(struct block_list *bl, va_list ap)
 BUILDIN_FUNC(getareagid)
 {
 	int map_id, type, count;
-	const char* mapname = NULL;
-	char* varname = NULL;
+	const char *mapname = NULL, *varname = NULL;
 	struct script_data *data = NULL;
+	struct map_session_data *sd = NULL;
 
+	//获得发送目标类型
 	type = script_getnum(st, 3);
+	//获得地图名
 	mapname = script_getstr(st, 2);
 
-	if (strcmp(mapname, "this") == 0) {
-		TBL_PC *sd;
-		if (!script_rid2sd(sd)) {
-			script_pushint(st, -1);
-			return SCRIPT_CMD_SUCCESS;
-		}
-		map_id = map_mapindex2mapid(sd->mapindex);
+	//获得数组参数(最后一个变量)
+	data = script_getdata(st, script_lastdata(st));
+	if (!data_isreference(data)) {
+		//不是变量报错
+		ShowWarning("buildin_getareagid: Error in argument! Please give a variable to store values in.\n");
+		return SCRIPT_CMD_FAILURE;
 	}
-	else
-		map_id = map_mapname2mapid(mapname);
+	//获得数组名
+	varname = reference_getname(data);
+
+	//如果为人物变量或者地图名为this,则判断人物是否关联
+	if (not_server_variable(*varname) || !strcmp(mapname, "this")) {
+		//人物变量则判断是否关联人物
+		if (!script_rid2sd(sd)) {
+			return SCRIPT_CMD_FAILURE;
+		}
+	}
+
+	//如果地图为this则根据关联的人物获得地图id,否则通过地图名获得id
+	map_id = (strcmp(mapname, "this") ? map_mapname2mapid(mapname) : map_mapindex2mapid(sd->mapindex));
 
 	if (map_id < 0) {
+		//地图不存在返回-2
 		script_pushint(st, -2);
 		return SCRIPT_CMD_SUCCESS;
 	}
 
-	data = script_getdata(st, script_lastdata(st));
-	if (!data_isreference(data)) {
-		ShowWarning("buildin_getareagid: Error in argument! Please give a variable to store values in.\n");
-		return SCRIPT_CMD_FAILURE;
-	}
-	varname = reference_getname(data);
-
+	//计数器初始为0
 	count = 0;
+	//如果7个参数(方法1)
 	if (script_hasdata(st, 8)) {
 		int x0, y0, x1, y1;
 		x0 = script_getnum(st, 4);
 		y0 = script_getnum(st, 5);
 		x1 = script_getnum(st, 6);
 		y1 = script_getnum(st, 7);
-		map_foreachinarea(buildin_getareagid_sub, map_id, x0, y0, x1, y1, type, st, varname, &count);
+		map_foreachinarea(buildin_getareagid_sub, map_id, x0, y0, x1, y1, type, st, sd, varname, &count);
 	}
-	else {
+	//如果6个参数(方法2)
+	else if (script_hasdata(st, 7)) {
 		struct block_list center;
 		int range;
-		if (script_hasdata(st, 7)) {
-			center.m = map_id;
-			center.x = script_getnum(st, 4);
-			center.y = script_getnum(st, 5);
-			range = script_getnum(st, 6);
-			map_foreachinrange(buildin_getareagid_sub, &center, range, type, st, varname, &count);
-		}
-		else {
-			map_foreachinmap(buildin_getareagid_sub, map_id, type, st, varname, &count);
-		}
+		center.m = map_id;
+		center.x = script_getnum(st, 4);
+		center.y = script_getnum(st, 5);
+		range = script_getnum(st, 6);
+		map_foreachinrange(buildin_getareagid_sub, &center, range, type, st, sd, varname, &count);
 	}
+	//(方法3)
+	else {
+		map_foreachinmap(buildin_getareagid_sub, map_id, type, st, sd, varname, &count);
+	}
+	//返回获取的gid数量
 	script_pushint(st, count);
 	return SCRIPT_CMD_SUCCESS;
 }
