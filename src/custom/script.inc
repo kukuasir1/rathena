@@ -120,7 +120,7 @@ BUILDIN_FUNC(unitremove)
 *		第二种方法为获取中心坐标周围的 GID；
 *		第三种方法为获取地图上的 GID；
 *
-*		当地图名为 Location 时，为玩家所在地图，此时必须有关联玩家。
+*		当地图名为 this 时，为玩家所在地图，此时必须有关联玩家。
 *		类型：BL_PC
 *			  BL_MOB
 *			  BL_PET
@@ -133,7 +133,6 @@ BUILDIN_FUNC(unitremove)
 *			  BL_ELEM
 *
 *		返回 -2 为没找到地图
-*		返回 -1 指定地图为 Location 但是没有关联玩家
 *		返回 0  没找到相关类型的实体
 *		返回 >0 为找到的相关数量
 *
@@ -142,6 +141,7 @@ BUILDIN_FUNC(unitremove)
 static int buildin_getareagid_sub(struct block_list *bl, va_list ap)
 {
 	//参数要按顺序读取
+	//如果使用人物变量,需要将人物的sd传递过来,而不能通过bl获得,此时的bl为循环中的对象
 	struct script_state *st = va_arg(ap, struct script_state *);
 	struct map_session_data *sd = va_arg(ap, struct map_session_data *);
 	const char *varname = va_arg(ap,const char *);
@@ -217,5 +217,142 @@ BUILDIN_FUNC(getareagid)
 	}
 	//返回获取的gid数量
 	script_pushint(st, count);
+	return SCRIPT_CMD_SUCCESS;
+}
+
+/*
+* script4each "{<脚本>}",<覆盖范围>{,<参数>...};
+* 
+* 对指定范围的玩家执行相同的一段脚本
+* 
+* 全服玩家			- script4each "{<脚本>}",0;
+* 指定地图			- script4each "{<脚本>}",1,"地图名";
+* 指定区域			- script4each "{<脚本>}",2,"地图名",中心坐标x,中心坐标y,范围;
+* 指定玩家所在的队伍	- script4each "{<脚本>}",3,玩家角色编号;
+* 指定玩家所在的公会	- script4each "{<脚本>}",4,玩家角色编号;
+* 指定区域			- script4each "{<脚本>}",5,"地图名",坐标x0,坐标y0,坐标x1,坐标y1;
+* 指定队伍			- script4each "{<脚本>}",6,队伍编号;
+* 指定公会			- script4each "{<脚本>}",7,公会编号;
+* 
+* 警告:
+* 	目前 script4each 所执行的脚本中, 禁止出现会导致脚本进入暂停状态的指令.
+* 	比如 sleep、sleep2、next、close2、menu、select、prompt、input、progressbar 等, 他们的特点是执行这些指令时, 
+* 	都需要等待客户端/玩家返回一定的信息或做出选择才能继续往下执行.
+* 
+* 返回值:
+* 	该指令无论成功失败, 都不会有返回值
+*/
+static int buildin_script4each_sub(struct block_list *bl, va_list ap)
+{
+	struct script_code *script = va_arg(ap, struct script_code *);
+	run_script(script, 0, bl->id, 0);
+	return 0;
+}
+
+
+BUILDIN_FUNC(script4each) {
+
+	struct map_session_data *pl_sd = NULL, *sd = NULL;
+	struct s_mapiterator *iter = NULL;
+	struct script_code *script = NULL;
+
+	const char *script_str = NULL, *mapname = NULL;
+	int type, map_id;
+
+	//获得执行脚本(去空格)
+	script_str = skip_space(script_getstr(st, 2));
+	//检查脚本格式,其实可以不写,parse_script也会检查格式
+	if (script_str == NULL || (script_str[0] && script_str[0] != '{' && script_str[strlen(script_str) - 1] != '}'))
+		return SCRIPT_CMD_SUCCESS;
+
+	if ( !( script = parse_script(script_str, "script4each", 0, 0) ) )
+		return SCRIPT_CMD_SUCCESS;
+
+	type = script_getnum(st, 3);
+	//如果超出0-7的范围则失败
+
+	switch (type) {
+	case 0:
+		//获得服务器所有人物的迭代器
+		iter = mapit_getallusers();
+		//遍历迭代器
+		for (pl_sd = (TBL_PC*)mapit_first(iter); mapit_exists(iter); pl_sd = (TBL_PC*)mapit_next(iter))
+			run_script(script, 0, pl_sd->bl.id, 0);
+		mapit_free(iter);
+		break;
+	case 1:
+		mapname = script_getstr(st, 4);
+		map_id = map_mapname2mapid(mapname);
+		if (map_id < 0)
+			return SCRIPT_CMD_SUCCESS;
+		map_foreachinmap(buildin_script4each_sub, map_id, BL_PC, script);
+		break;
+	case 2:
+		struct block_list center;
+		int range;
+		mapname = script_getstr(st, 4);
+		map_id = map_mapname2mapid(mapname);
+		if (map_id < 0)
+			return SCRIPT_CMD_SUCCESS;
+		center.m = map_id;
+		center.x = script_getnum(st, 5);
+		center.y = script_getnum(st, 6);
+		range = script_getnum(st, 7);
+
+		map_foreachinrange(buildin_script4each_sub, &center, range, BL_PC, script);
+		break;
+	case 3:
+		script_charid2sd(5, sd);
+		iter = mapit_getallusers();
+		for (pl_sd = (TBL_PC*)mapit_first(iter); mapit_exists(iter); pl_sd = (TBL_PC*)mapit_next(iter)) {
+			if (pl_sd->status.party_id == sd->status.party_id)
+				run_script(script, 0, pl_sd->bl.id, 0);
+		}
+		mapit_free(iter);
+		break;
+	case 4:
+		script_charid2sd(5, sd);
+		iter = mapit_getallusers();
+		for (pl_sd = (TBL_PC*)mapit_first(iter); mapit_exists(iter); pl_sd = (TBL_PC*)mapit_next(iter)) {
+			if (pl_sd->status.guild_id == sd->status.guild_id)
+				run_script(script, 0, pl_sd->bl.id, 0);
+		}
+		mapit_free(iter);
+		break;
+	case 5:
+		int x0, y0, x1, y1;
+		mapname = script_getstr(st, 4);
+		map_id = map_mapname2mapid(mapname);
+		if (map_id < 0) {
+			return SCRIPT_CMD_SUCCESS;
+		}
+		x0 = script_getnum(st, 5);
+		y0 = script_getnum(st, 6);
+		x1 = script_getnum(st, 7);
+		y1 = script_getnum(st, 8);
+
+		map_foreachinarea(buildin_script4each_sub, map_id, x0, y0, x1, y1, BL_PC, script);
+		break;
+	case 6:
+		int party_id;
+		party_id = script_getnum(st, 4);
+		iter = mapit_getallusers();
+		for (pl_sd = (TBL_PC*)mapit_first(iter); mapit_exists(iter); pl_sd = (TBL_PC*)mapit_next(iter)) {
+			if (pl_sd->status.party_id == party_id)
+				run_script(script, 0, pl_sd->bl.id, 0);
+		}
+		mapit_free(iter);
+		break;
+	case 7:
+		int guild_id;
+		guild_id = script_getnum(st, 4);
+		iter = mapit_getallusers();
+		for (pl_sd = (TBL_PC*)mapit_first(iter); mapit_exists(iter); pl_sd = (TBL_PC*)mapit_next(iter)) {
+			if (pl_sd->status.guild_id == guild_id)
+				run_script(script, 0, pl_sd->bl.id, 0);
+		}
+		mapit_free(iter);
+		break;
+	}
 	return SCRIPT_CMD_SUCCESS;
 }
