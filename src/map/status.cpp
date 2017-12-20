@@ -13610,7 +13610,7 @@ int status_change_timer(int tid, unsigned int tick, int id, intptr_t data)
 			map_freeblock_lock();
 			status_zap(bl, damage, 0);
 			if (sc->data[type]) {
-				sc_timer_next(1000 + tick, status_change_timer, bl->id, data);
+				sc_timer_next(1000 + tick);
 			}
 			map_freeblock_unlock();
 			return 0;
