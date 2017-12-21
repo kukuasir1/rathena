@@ -10,8 +10,15 @@
 
 //BUILDIN_DEF(example,""),
 
-BUILDIN_DEF(uniteffect,"ii?"), //[kuku]
-BUILDIN_DEF2(uniteffect,"mobeffect","ii?"), //kuku
-BUILDIN_DEF(unitremove, "i?"),//[╰づ记忆•斑驳〤]
-BUILDIN_DEF(getareagid, "si*"),//[╰づ记忆•斑驳〤]
-BUILDIN_DEF(script4each, "si*"), //[kuku]
+BUILDIN_DEF(uniteffect,"ii?"),
+BUILDIN_DEF2(uniteffect,"mobeffect","ii?"),
+BUILDIN_DEF(unitremove, "i?"),
+BUILDIN_DEF(getareagid, "si*"),
+BUILDIN_DEF(script4each, "si*"),
+BUILDIN_DEF(delinventory, "ii?"),
+BUILDIN_DEF(countinventory, "i?"),
+BUILDIN_DEF(identifybyidx, "i?"),
+BUILDIN_DEF(equipinventory, "i?"),
+BUILDIN_DEF(unequipinventory, "i?"),
+BUILDIN_DEF(getinventoryinfo, "ii?"),
+BUILDIN_DEF(searcharray, "rv"),

@@ -356,3 +356,255 @@ BUILDIN_FUNC(script4each) {
 	}
 	return SCRIPT_CMD_SUCCESS;
 }
+
+//delinventory <背包位置序号>,<要移除的数量>{,<char_id>};
+BUILDIN_FUNC(delinventory)
+{
+	TBL_PC *sd;
+	int idx, count;
+	if (!script_charid2sd(4, sd))
+		return SCRIPT_CMD_FAILURE;
+
+	idx = script_getnum(st, 2);
+	count = script_getnum(st, 3);
+
+	//pc_delitem中对错误情况进行了判断,所以无需自己判断
+	if (pc_delitem(sd, idx, count, 0, 0, LOG_TYPE_OTHER))
+		script_pushint(st, 0); //失败返回0
+	else
+		script_pushint(st, 1); //成功返回1
+	return SCRIPT_CMD_SUCCESS;
+}
+
+//countinventory <背包位置序号>{,<char_id>};
+BUILDIN_FUNC(countinventory)
+{
+	TBL_PC *sd;
+	int idx, count;
+	if (!script_charid2sd(3, sd))
+		return SCRIPT_CMD_FAILURE;
+
+	idx = script_getnum(st, 2);
+	if (idx < 0 || idx >= MAX_INVENTORY || sd->inventory.u.items_inventory[idx].nameid <= 0 || sd->inventory_data[idx] == NULL) {
+		script_pushint(st, 0);
+		return SCRIPT_CMD_SUCCESS;
+	}
+
+	count = sd->inventory.u.items_inventory[idx].amount;
+	script_pushint(st, count);
+	return SCRIPT_CMD_SUCCESS;
+}
+
+//identifybyidx <背包位置序号>{,<char_id>};	
+BUILDIN_FUNC(identifybyidx)
+{
+	TBL_PC *sd;
+	int idx;
+	if (!script_charid2sd(3, sd))
+		return SCRIPT_CMD_FAILURE;
+
+	idx = script_getnum(st, 2);
+
+	if (idx < 0 || idx >= MAX_INVENTORY || sd->inventory.u.items_inventory[idx].nameid <= 0 || sd->inventory_data[idx] == NULL) {
+		return SCRIPT_CMD_SUCCESS;
+	}
+
+	sd->inventory.u.items_inventory[idx].identify = 1;
+	clif_item_identified(sd, idx, 0);
+
+	return SCRIPT_CMD_SUCCESS;
+}
+
+//equipinventory <背包位置序号>{,<char_id>};
+BUILDIN_FUNC(equipinventory)
+{
+	TBL_PC *sd;
+	struct item_data *item_data;
+	int idx;
+
+	if (!script_charid2sd(3, sd))
+		return SCRIPT_CMD_FAILURE;
+
+	idx = script_getnum(st, 2);
+
+	//pc_equipitem其实已经进行了判断,但是要获得item_data->equip,必须对idx进行判断
+	if (idx < 0 || idx >= MAX_INVENTORY || sd->inventory.u.items_inventory[idx].nameid <= 0 || sd->inventory_data[idx] == NULL)
+		script_pushint(st, 0);
+	else if ((item_data = itemdb_exists(sd->inventory.u.items_inventory[idx].nameid))) {
+		if (pc_equipitem(sd, idx, item_data->equip))
+			script_pushint(st, 1);
+		else
+			script_pushint(st, 0);
+	}
+	return SCRIPT_CMD_SUCCESS;
+}
+
+//unequipinventory <背包位置序号>{,<char_id>};
+BUILDIN_FUNC(unequipinventory)
+{
+	TBL_PC *sd;
+	struct item_data *item_data;
+	int idx;
+
+	if (!script_charid2sd(3, sd))
+		return SCRIPT_CMD_FAILURE;
+
+	idx = script_getnum(st, 2);
+
+	if (idx < 0 || idx >= MAX_INVENTORY || sd->inventory.u.items_inventory[idx].nameid <= 0 || sd->inventory_data[idx] == NULL)
+		script_pushint(st, 0);
+	else if ((item_data = itemdb_exists(sd->inventory.u.items_inventory[idx].nameid))) {
+		if (pc_unequipitem(sd, idx, item_data->equip))
+			script_pushint(st, 1);
+		else
+			script_pushint(st, 0);
+	}
+	return SCRIPT_CMD_SUCCESS;
+}
+
+//getinventoryinfo <背包位置序号>,<要查看的信息类型>{,<char_id>};
+BUILDIN_FUNC(getinventoryinfo)
+{
+	TBL_PC *sd;
+
+	int idx, type;
+
+	if (!script_charid2sd(4, sd))
+		return SCRIPT_CMD_FAILURE;
+
+	idx = script_getnum(st, 2);
+	type = script_getnum(st, 3);
+
+	if (idx < 0 || idx >= MAX_INVENTORY || sd->inventory.u.items_inventory[idx].nameid <= 0 || sd->inventory_data[idx] == NULL || type < 0 || type > 11) {
+		if (type == 11)
+			script_pushstrcopy(st, "-1");
+		else
+			script_pushint(st, -1);
+		return SCRIPT_CMD_SUCCESS;
+	}
+
+	switch (type) {
+	case 0:
+		unsigned short nameid;
+		nameid = sd->inventory.u.items_inventory[idx].nameid;
+		script_pushint(st, nameid);
+		break;
+	case 1:
+		short amount;
+		amount = sd->inventory.u.items_inventory[idx].amount;
+		script_pushint(st, amount);
+		break;
+	case 2:
+		unsigned int equip;
+		equip = sd->inventory.u.items_inventory[idx].equip;
+		script_pushint(st, equip);
+		break;
+	case 3:
+		char refine;
+		refine = sd->inventory.u.items_inventory[idx].refine;
+		script_pushint(st, refine);
+		break;
+	case 4:
+		char identify;
+		identify = sd->inventory.u.items_inventory[idx].identify;
+		script_pushint(st, identify);
+		break;
+	case 5:
+		char attribute;
+		attribute = sd->inventory.u.items_inventory[idx].attribute;
+		script_pushint(st, attribute);
+		break;
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+		unsigned short card;
+		card = sd->inventory.u.items_inventory[idx].card[type - 6];
+		script_pushint(st, card);
+		break;
+	case 10:
+		unsigned int expire_time;
+		expire_time = sd->inventory.u.items_inventory[idx].expire_time;
+		script_pushint(st, expire_time);
+		break;
+	case 11:
+		char uid[CHAT_SIZE_MAX];
+		safesnprintf(uid, sizeof(uid), "%llu", (unsigned long long)sd->inventory.u.items_inventory[idx].unique_id);
+		script_pushstrcopy(st, uid);
+		break;
+	}
+	return SCRIPT_CMD_SUCCESS;
+}
+
+//searcharray <数组名>,<搜索的内容(可以是字符串或是数字)>
+//成功范围第一个搜索到的索引,失败返回-1
+BUILDIN_FUNC(searcharray)
+{
+	struct script_data* data;
+	const char *varname = NULL;
+	struct map_session_data *sd = NULL;
+	int j = -1; //返回值默认为-1
+	unsigned int start, end;
+
+	data = script_getdata(st, 2);
+	//判断是否为变量
+	if (!data_isreference(data)) {
+		ShowError("buildin_searcharray: not a variable\n");
+		return SCRIPT_CMD_FAILURE;// not a variable
+	}
+
+	//获取变量名
+	varname = reference_getname(data);
+
+	//判断是否为人物变量
+	if (not_server_variable(*varname)) {
+		//人物变量则判断是否关联人物
+		if (!script_rid2sd(sd)) {
+			return SCRIPT_CMD_FAILURE;
+		}
+	}
+	//判断是否为数组
+	if (!script_array_src(st, sd, varname, reference_getref(data))) {
+		ShowError("buildin_searcharray: not a array!\n");
+		return SCRIPT_CMD_FAILURE;
+	}
+
+	//获取数组起始索引
+	start = reference_getindex(data);
+	//获取数组结束索引
+	end = script_array_highest_key(st, sd, varname, reference_getref(data));
+
+	//排除空数组
+	if (start < end) {
+		int id;
+		//获取数组的uid
+		id = reference_getid(data);
+		for (; start < end; start++) {
+			//如果是字符串型数组
+			if (is_string_variable(varname)) {
+				//取得start索引的的数组字符串元素,放入栈顶
+				char *str = (char*)get_val2(st, reference_uid(id, start), reference_getref(data));
+				int x = strcmp(str, script_getstr(st, 3));
+				//get_val2使用之后必须手动清除栈顶,否则script_pushint将出错
+				script_removetop(st, -1, 0);
+				if (x == 0) {
+					j = start;
+					break;
+				}
+			}
+			else {
+				//取得start索引的的数组数字元素,放入栈顶
+				int32 num = (int32)__64BPRTSIZE(get_val2(st, reference_uid(id, start), reference_getref(data)));
+				bool x = (num == script_getnum(st, 3));
+				//get_val2使用之后必须手动清除栈顶,否则script_pushint将出错
+				script_removetop(st, -1, 0);
+				if (x) {
+					j = start;
+					break;
+				}
+			}
+		}
+	}
+	script_pushint(st, j);
+	return SCRIPT_CMD_SUCCESS;
+}

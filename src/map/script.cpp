@@ -13875,6 +13875,13 @@ BUILDIN_FUNC(getinventorylist)
 		return SCRIPT_CMD_FAILURE;
 	for(i=0;i<MAX_INVENTORY;i++){
 		if(sd->inventory.u.items_inventory[i].nameid > 0 && sd->inventory.u.items_inventory[i].amount > 0){
+			char uid[CHAT_SIZE_MAX];
+			safesnprintf(uid, sizeof(uid), "%llu", (unsigned long long)sd->inventory.u.items_inventory[i].unique_id);
+			//获取背包物品的unique_id,由于长度问题存入字符串
+			pc_setregstr(sd, reference_uid(add_str("@inventorylist_uid$"), j), uid);
+			//获取背包物品索引
+			pc_setreg(sd, reference_uid(add_str("@inventorylist_idx"), j), i);
+
 			pc_setreg(sd,reference_uid(add_str("@inventorylist_id"), j),sd->inventory.u.items_inventory[i].nameid);
 			pc_setreg(sd,reference_uid(add_str("@inventorylist_amount"), j),sd->inventory.u.items_inventory[i].amount);
 			pc_setreg(sd,reference_uid(add_str("@inventorylist_equip"), j),sd->inventory.u.items_inventory[i].equip);
