@@ -1347,6 +1347,8 @@ bool pc_authok(struct map_session_data *sd, uint32 login_id2, time_t expiration_
 	sd->hatEffectCount = 0;
 #endif
 
+	sd->catch_target_class = PET_CATCH_FAIL;
+
 	// Check EXP overflow, since in previous revision EXP on Max Level can be more than 'official' Max EXP
 	if (pc_is_maxbaselv(sd) && sd->status.base_exp > MAX_LEVEL_BASE_EXP) {
 		sd->status.base_exp = MAX_LEVEL_BASE_EXP;
@@ -5059,8 +5061,8 @@ int pc_useitem(struct map_session_data *sd,int n)
 
 	sd->itemid = item.nameid;
 	sd->itemindex = n;
-	if(sd->catch_target_class != -1) //Abort pet catching.
-		sd->catch_target_class = -1;
+	if(sd->catch_target_class != PET_CATCH_FAIL) //Abort pet catching.
+		sd->catch_target_class = PET_CATCH_FAIL;
 
 	amount = item.amount;
 	script = id->script;
@@ -12262,6 +12264,8 @@ void pc_show_questinfo(struct map_session_data *sd) {
 		return;
 	if (!map[sd->bl.m].qi_count || !map[sd->bl.m].qi_data)
 		return;
+	if (map[sd->bl.m].qi_count != sd->qi_count)
+		return; // init was not called yet
 
 	for(i = 0; i < map[sd->bl.m].qi_count; i++) {
 		qi = &map[sd->bl.m].qi_data[i];
