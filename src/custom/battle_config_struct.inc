@@ -12,4 +12,3 @@
  *	 <datatype> name;
  **/
 
-int re_aspd_type;  // CRO攻速公式开关 [夜天师]
