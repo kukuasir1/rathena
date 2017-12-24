@@ -738,12 +738,13 @@ int pc_equippoint_sub(struct map_session_data *sd,struct item_data* id){
 		return 0; //Not equippable by players.
 
 	ep = id->equip;
-	if(id->look == W_DAGGER	||
-		id->look == W_1HSWORD ||
-		id->look == W_1HAXE) {
-		if(ep == EQP_HAND_R && (pc_checkskill(sd,AS_LEFT) > 0 || (sd->class_&MAPID_UPPERMASK) == MAPID_ASSASSIN ||
-			(sd->class_&MAPID_UPPERMASK) == MAPID_KAGEROUOBORO))//Kagerou and Oboro can dual wield daggers. [Rytech]
-			return EQP_ARMS;
+	if(id->look == W_DAGGER	|| id->look == W_1HSWORD || id->look == W_1HAXE) {
+		if(pc_checkskill(sd,AS_LEFT) > 0 || (sd->class_&MAPID_UPPERMASK) == MAPID_ASSASSIN || (sd->class_&MAPID_UPPERMASK) == MAPID_KAGEROUOBORO) { //Kagerou and Oboro can dual wield daggers. [Rytech]
+			if (ep == EQP_WEAPON)
+				return EQP_ARMS;
+			if (ep == EQP_SHADOW_WEAPON)
+				return EQP_SHADOW_ARMS;
+		}
 	}
 	return ep;
 }
@@ -1098,6 +1099,10 @@ uint8 pc_isequip(struct map_session_data *sd,int n)
 	if(item->sex != 2 && sd->status.sex != item->sex)
 		return ITEM_EQUIP_ACK_FAIL;
 
+	//fail to equip if item is restricted
+	if (!battle_config.allow_equip_restricted_item && itemdb_isNoEquip(item, sd->bl.m))
+		return ITEM_EQUIP_ACK_FAIL;
+
 	if (sd->sc.count) {
 		if(item->equip & EQP_ARMS && item->type == IT_WEAPON && sd->sc.data[SC_STRIPWEAPON]) // Also works with left-hand weapons [DracoRPG]
 			return ITEM_EQUIP_ACK_FAIL;
@@ -1130,15 +1135,11 @@ uint8 pc_isequip(struct map_session_data *sd,int n)
 		}
 	}
 
-	//fail to equip if item is restricted
-	if (!battle_config.allow_equip_restricted_item && itemdb_isNoEquip(item, sd->bl.m))
+	//Not equipable by class. [Skotlex]
+	if (!(1ULL << (sd->class_&MAPID_BASEMASK)&item->class_base[(sd->class_&JOBL_2_1) ? 1 : ((sd->class_&JOBL_2_2) ? 2 : 0)]))
 		return ITEM_EQUIP_ACK_FAIL;
 
-	//Not equipable by class. [Skotlex]
-	if (!(1ULL<<(sd->class_&MAPID_BASEMASK)&item->class_base[(sd->class_&JOBL_2_1)?1:((sd->class_&JOBL_2_2)?2:0)]))
-		return ITEM_EQUIP_ACK_FAIL;
-	
-	if (!pc_isItemClass(sd,item))
+	if (!pc_isItemClass(sd, item))
 		return ITEM_EQUIP_ACK_FAIL;
 
 	return ITEM_EQUIP_ACK_OK;
@@ -9793,16 +9794,21 @@ bool pc_equipitem(struct map_session_data *sd,short n,int req_pos)
 			pos = sd->equip_index[EQI_ACC_R] >= 0 ? EQP_ACC_L : EQP_ACC_R;
 	}
 
+	if(pos == EQP_ARMS && id->equip == EQP_HAND_R) { //Dual wield capable weapon.
+		pos = (req_pos&EQP_ARMS);
+		if (pos == EQP_ARMS) //User specified both slots, pick one for them.
+			pos = sd->equip_index[EQI_HAND_R] >= 0 ? EQP_HAND_L : EQP_HAND_R;
+	}
+
 	if(pos == EQP_SHADOW_ACC) { // Shadow System
 		pos = req_pos&EQP_SHADOW_ACC;
 		if (pos == EQP_SHADOW_ACC)
 			pos = sd->equip_index[EQI_SHADOW_ACC_L] >= 0 ? EQP_SHADOW_ACC_R : EQP_SHADOW_ACC_L;
 	}
-
-	if(pos == EQP_ARMS && id->equip == EQP_HAND_R) { //Dual wield capable weapon.
-		pos = (req_pos&EQP_ARMS);
-		if (pos == EQP_ARMS) //User specified both slots, pick one for them.
-			pos = sd->equip_index[EQI_HAND_R] >= 0 ? EQP_HAND_L : EQP_HAND_R;
+	if(pos == EQP_SHADOW_ARMS && id->equip == EQP_SHADOW_WEAPON) {
+		pos = (req_pos&EQP_SHADOW_ARMS);
+		if( pos == EQP_SHADOW_ARMS )
+			pos = (sd->equip_index[EQI_SHADOW_WEAPON] >= 0 ? EQP_SHADOW_SHIELD : EQP_SHADOW_WEAPON);
 	}
 
 	if (pos&EQP_HAND_R && battle_config.use_weapon_skill_range&BL_PC) {
