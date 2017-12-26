@@ -19,7 +19,7 @@
 //}
 
 /*
-* 根据GID让指定对象显示effect [kuku]
+* 根据GID让指定对象显示effect
 * uniteffect <GID>,<effect number>{,<send_target>}
 */
 BUILDIN_FUNC(uniteffect) {
@@ -36,14 +36,6 @@ BUILDIN_FUNC(uniteffect) {
 
 /*根据gid删除对象
 * unitremove <GID>{,<Type>};
-* type:
-* CLR_OUTSIGHT / CLR_DEAD / CLR_RESPAWN / CLR_TELEPORT / CLR_TRICKDEAD
-* type:
-*    0 = out of sight
-*    1 = died
-*    2 = logged out
-*    3 = teleport
-*    4 = trickdead
 */
 BUILDIN_FUNC(unitremove)
 {
@@ -116,27 +108,6 @@ BUILDIN_FUNC(unitremove)
 * getareagid("<地图名>",<类型>,<x0>,<y0>,<x1>,<y1>,<arrayname>);
 * getareagid("<地图名>",<类型>,<中心坐标x>,<中心坐标y>,<半径>,<arrayname>);
 * getareagid("<地图名>",<类型>,<arrayname>);
-*		第一种方法为获取区域内 GID；
-*		第二种方法为获取中心坐标周围的 GID；
-*		第三种方法为获取地图上的 GID；
-*
-*		当地图名为 this 时，为玩家所在地图，此时必须有关联玩家。
-*		类型：BL_PC
-*			  BL_MOB
-*			  BL_PET
-*			  BL_HOM
-*			  BL_MER
-*			  BL_ITEM
-*			  BL_SKILL
-*			  BL_NPC
-*			  BL_CHAT
-*			  BL_ELEM
-*
-*		返回 -2 为没找到地图
-*		返回 0  没找到相关类型的实体
-*		返回 >0 为找到的相关数量
-*
-*		如果找到了相关实体，数组将会保存在 $@areagid 中
 */
 static int buildin_getareagid_sub(struct block_list *bl, va_list ap)
 {
@@ -220,28 +191,8 @@ BUILDIN_FUNC(getareagid)
 	return SCRIPT_CMD_SUCCESS;
 }
 
-/*
-* script4each "{<脚本>}",<覆盖范围>{,<参数>...};
-* 
-* 对指定范围的玩家执行相同的一段脚本
-* 
-* 全服玩家			- script4each "{<脚本>}",0;
-* 指定地图			- script4each "{<脚本>}",1,"地图名";
-* 指定区域			- script4each "{<脚本>}",2,"地图名",中心坐标x,中心坐标y,范围;
-* 指定玩家所在的队伍	- script4each "{<脚本>}",3,玩家角色编号;
-* 指定玩家所在的公会	- script4each "{<脚本>}",4,玩家角色编号;
-* 指定区域			- script4each "{<脚本>}",5,"地图名",坐标x0,坐标y0,坐标x1,坐标y1;
-* 指定队伍			- script4each "{<脚本>}",6,队伍编号;
-* 指定公会			- script4each "{<脚本>}",7,公会编号;
-* 
-* 警告:
-* 	目前 script4each 所执行的脚本中, 禁止出现会导致脚本进入暂停状态的指令.
-* 	比如 sleep、sleep2、next、close2、menu、select、prompt、input、progressbar 等, 他们的特点是执行这些指令时, 
-* 	都需要等待客户端/玩家返回一定的信息或做出选择才能继续往下执行.
-* 
-* 返回值:
-* 	该指令无论成功失败, 都不会有返回值
-*/
+
+//script4each "{<脚本>}",<覆盖范围>{,<参数>...};
 static int buildin_script4each_sub(struct block_list *bl, va_list ap)
 {
 	struct script_code *script = va_arg(ap, struct script_code *);
@@ -357,6 +308,7 @@ BUILDIN_FUNC(script4each) {
 	return SCRIPT_CMD_SUCCESS;
 }
 
+
 //delinventory <背包位置序号>,<要移除的数量>{,<char_id>};
 BUILDIN_FUNC(delinventory)
 {
@@ -375,6 +327,7 @@ BUILDIN_FUNC(delinventory)
 		script_pushint(st, 1); //成功返回1
 	return SCRIPT_CMD_SUCCESS;
 }
+
 
 //countinventory <背包位置序号>{,<char_id>};
 BUILDIN_FUNC(countinventory)
@@ -395,6 +348,7 @@ BUILDIN_FUNC(countinventory)
 	return SCRIPT_CMD_SUCCESS;
 }
 
+
 //identifybyidx <背包位置序号>{,<char_id>};	
 BUILDIN_FUNC(identifybyidx)
 {
@@ -414,6 +368,7 @@ BUILDIN_FUNC(identifybyidx)
 
 	return SCRIPT_CMD_SUCCESS;
 }
+
 
 //equipinventory <背包位置序号>{,<char_id>};
 BUILDIN_FUNC(equipinventory)
@@ -439,6 +394,7 @@ BUILDIN_FUNC(equipinventory)
 	return SCRIPT_CMD_SUCCESS;
 }
 
+
 //unequipinventory <背包位置序号>{,<char_id>};
 BUILDIN_FUNC(unequipinventory)
 {
@@ -461,6 +417,7 @@ BUILDIN_FUNC(unequipinventory)
 	}
 	return SCRIPT_CMD_SUCCESS;
 }
+
 
 //getinventoryinfo <背包位置序号>,<要查看的信息类型>{,<char_id>};
 BUILDIN_FUNC(getinventoryinfo)
@@ -536,6 +493,7 @@ BUILDIN_FUNC(getinventoryinfo)
 	return SCRIPT_CMD_SUCCESS;
 }
 
+
 //searcharray <数组名>,<搜索的内容(可以是字符串或是数字)>
 //成功范围第一个搜索到的索引,失败返回-1
 BUILDIN_FUNC(searcharray)
@@ -606,5 +564,104 @@ BUILDIN_FUNC(searcharray)
 		}
 	}
 	script_pushint(st, j);
+	return SCRIPT_CMD_SUCCESS;
+}
+
+
+//getequipexpiretick <装备位置编号>{,<角色编号>};
+BUILDIN_FUNC(getequipexpiretick)
+{
+	TBL_PC* sd;
+	int i, num;
+
+	//判断是否关联人物
+	if (!script_charid2sd(3, sd)) {
+		script_pushint(st, -1);
+		return SCRIPT_CMD_FAILURE;
+	}
+
+	num = script_getnum(st, 2);
+
+	//判断装备位置是否合法
+	if (equip_index_check(num))
+		//获得装备在背包中的索引
+		i = pc_checkequip(sd, equip_bitmask[num]);
+	else {
+		//提示装备位置不合法
+		ShowError("buildin_getequipexpiretick: Unknown equip index '%d'\n", num);
+		script_pushint(st, -1);
+		return SCRIPT_CMD_FAILURE;
+	}
+
+	//背包索引在合理范围并且item_db数据存在
+	if (i >= 0 && i < MAX_INVENTORY && sd->inventory_data[i]) {
+		//剩余时间 = 过期时间戳 - 当前时间戳
+		unsigned int expire_tick = (unsigned int)(sd->inventory.u.items_inventory[i].expire_time - time(NULL));
+		script_pushint(st, (int)expire_tick);
+	}
+	else
+		script_pushint(st, -1);
+
+	return SCRIPT_CMD_SUCCESS;
+}
+
+
+//setrenttime <装备位置编号>,<增减的时间秒数>{,<角色编号>};
+BUILDIN_FUNC(setrenttime)
+{
+	TBL_PC* sd;
+	int i, num, tick;
+
+	//判断是否关联人物
+	if (!script_charid2sd(4, sd)) {
+		script_pushint(st, -1);
+		return SCRIPT_CMD_FAILURE;
+	}
+
+	num = script_getnum(st, 2);
+	tick = script_getnum(st, 3);
+
+	//判断装备位置是否合法
+	if (equip_index_check(num))
+		//获得装备在背包中的索引
+		i = pc_checkequip(sd, equip_bitmask[num]);
+	else {
+		//提示装备位置不合法
+		ShowError("buildin_getequipexpiretick: Unknown equip index '%d'\n", num);
+		script_pushint(st, -1);
+		return SCRIPT_CMD_FAILURE;
+	}
+
+	//背包索引在合理范围并且item_db数据存在
+	if (i >= 0 && i < MAX_INVENTORY && sd->inventory_data[i]) {
+		//过期时间不为0,则为租赁物品
+		if (!sd->inventory.u.items_inventory[i].expire_time)
+			//过期时间 = 当前时间戳 + 增加的时间, 不加当前时间戳则为1970.1.1起计算的时间
+			sd->inventory.u.items_inventory[i].expire_time = (unsigned int)(time(NULL) + tick);
+		else
+			//当前租赁时间 + 增加的时间
+			sd->inventory.u.items_inventory[i].expire_time += tick;
+
+		//如果当前时间超过了过期时间
+		if (time(NULL) > sd->inventory.u.items_inventory[i].expire_time) {
+			//发送物品过期封包
+			clif_rental_expired(sd->fd, i, sd->inventory.u.items_inventory[i].nameid);
+			//删除该物品
+			pc_delitem(sd, i, sd->inventory.u.items_inventory[i].amount, 1, 0, LOG_TYPE_OTHER);
+			script_pushint(st, -1);
+		}
+		else {
+			//获得最终的过期时间
+			unsigned int seconds = (unsigned int)(sd->inventory.u.items_inventory[i].expire_time - time(NULL));
+			//发送租赁物品封包
+			clif_rental_time(sd->fd, sd->inventory.u.items_inventory[i].nameid, seconds);
+			//添加租赁计时器
+			pc_inventory_rental_add(sd, seconds);
+			script_pushint(st, (int)seconds);
+		}
+	}
+	else
+		script_pushint(st, -1);
+
 	return SCRIPT_CMD_SUCCESS;
 }
