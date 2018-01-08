@@ -3952,7 +3952,7 @@
 5822,Love_Chick_Hat,Love Chick Hat,4,10000,,100,,4,,0,0xFFFFFFFF,63,2,256,,0,1,500,{ bonus bLuk,4; bonus bMaxHP,100; bonus bMaxSP,100; bonus2 bSubRace,RC_Brute,7; bonus2 bSubRace,RC_DemiHuman,7; bonus2 bSubRace,RC_Player,7; },{},{}
 5823,Love_Arrow,Love Arrow,4,5000,,100,,1,,0,0xFFFFFFFF,63,2,136,,0,0,0,{ bonus bDex,5; bonus bAgi,5; },{},{}
 5824,Fools_Day_Hat,Fools Day Hat,4,20,,300,,6,,0,0xFFFFFFFF,63,2,256,,30,1,265,{},{},{}
-5825,Badge_Of_Order_Grace,Badge Of Order Grace,4,0,,0,,1,,0,0xFFFFFFFF,63,2,136,,0,0,0,{ bonus bMdef,1; },{},{}
+5825,Badge_Of_Order_Grace,Badge Of Order Grace,4,0,,0,,1,,0,0xFFFFFFFF,63,2,136,,0,0,0,{ bonus bMdef,1; bonus2 bAddClass,Class_All,10; bonus bMatkRate,10; bonus bMaxHP,1500; },{},{}
 5826,Valkyrie_Helmet,Valkyrie Helmet,4,0,,0,,10,,0,0xFFFFFFFF,63,2,256,,0,0,225,{ bonus bStr,2; bonus bInt,2; bonus bDex,2; bonus bAgi,2; bonus bMdef,5; },{},{}
 5827,Book_File_Hat,Book File Hat,4,20,,100,,1,,0,0xFFFFFFFF,63,2,256,,1,1,423,{},{},{}
 5828,Honor_Gold_Ring,Honor Gold Ring,4,0,,50,,0,,0,0xFFFFFFFF,63,2,136,,1,1,0,{ bonus bAllStats,1; bonus bMdef,5; },{},{}
@@ -9900,6 +9900,7 @@
 19153,Ghostring_Balloon,Ghostring Balloon,4,20,,10,,0,,0,0xFFFFFFFF,63,2,1,,1,0,1436,{ bonus3 bAutoSpell,"MG_SOULSTRIKE",5,10; bonus2 bExpAddRace,RC_All,5; bonus2 bDropAddRace,RC_All,5; },{},{}
 19154,Arch_Angelring_Balloon,Arch Angelring Balloon,4,20,,10,,0,,0,0xFFFFFFFF,63,2,1,,1,0,1437,{ skill "ALL_RESURRECTION",1; bonus2 bExpAddRace,RC_All,5; bonus2 bDropAddRace,RC_All,5; },{},{}
 19155,Demons_Eyes,Demon's Eyes,4,20,,10,,0,,0,0xFFFFFFFF,63,2,512,,60,0,1490,{ bonus2 bSubRace,RC_Player,3; bonus bFlee2,2; },{},{}
+19156,Lunar_Rainbow,Lunar Rainbow,4,20,,200,,10,,1,0xFFFFFFFF,63,2,256,,80,1,704,{ bonus bAgi,3; bonus bMdef,10; bonus bMatk,(10*getrefine()); },{},{}
 19157,Drooping_Rebellion_,Drooping Rebellion,4,20,,200,,1,,1,0xFFFFFFFF,63,2,256,,1,1,1444,{ bonus bAllStats,1; bonus bUseSPrate,-10; .@r = getrefine(); if (.@r >= 9) { bonus bAspd,1; } if (.@r >= 12) { bonus bSpeedRate,25; } bonus2 bExpAddRace,RC_All,5; bonus2 bDropAddRace,RC_All,5; },{},{}
 19158,C_GeminiS58_Eyes_Blue,Costume GeminiS58 Eyes Blue,4,0,,0,,0,,0,0xFFFFFFFF,63,2,2048,,0,0,1456,{},{},{}
 19159,Barrel_Helm,Barrel Helm,4,20,,420,,59,,1,0xFFFFFFFF,63,2,769,,60,1,1498,{ bonus bVit,5; bonus bHPrecovRate,-10; .@r = getrefine(); if (.@r >= 7) { bonus bDef,100; skill "CR_AUTOGUARD",1; } if (.@r >= 8) { bonus2 bSubRace,RC_DemiHuman,10; bonus2 bSubRace,RC_Player,10; if(BaseJob==Job_SuperNovice) { skill "CR_AUTOGUARD",5; } } },{},{}
