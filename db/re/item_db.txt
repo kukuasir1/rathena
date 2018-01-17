@@ -2162,7 +2162,7 @@
 2976,Red_Lantern,Red Lantern,4,10,,200,,0,,1,0xFFFFFFFF,63,2,136,,100,0,,{ bonus bMaxSP,-300; skill "MG_SIGHT",1; },{},{ sc_end SC_SIGHT; }
 2977,Hurt_Mind,Hurt Mind,4,10,,100,,0,,1,0xFFFFFFFF,63,2,136,,110,0,,{ bonus bMaxSP,200; skill "DC_SCREAM",3; },{},{}
 2978,KindHeart,Kind Heart,4,10,,100,,0,,1,0xFFFFFFFF,63,2,136,,110,0,,{ bonus bMaxHP,500; bonus2 bHPRegenRate,300,10000; skill "DC_SCREAM",3; },{},{}
-2979,Strawberry_Decoration,Strawberry Decoration,4,0,,500,,1,,1,0xFFFFFFFF,63,2,136,,,0,,{ bonus bAllStats,1; bonus3 bAutoSpellWhenHit,"WZ_FROSTNOVA",3,10; /* Confirm: Frost Nova cast chance */ },{},{}
+2979,Strawberry_Decoration,Strawberry Decoration,4,20,,500,,1,,1,0xFFFFFFFE,63,2,136,,1,,,{ bonus bAllStats,1; bonus3 bAutoSpellWhenHit,"WZ_FROSTNOVA",3,10; /* Confirm: Frost Nova cast chance */ },{},{}
 2980,Evilspirit_Gloves,Evilspirit Gloves,4,10,,100,,,,1,0xFFFFFFFF,63,2,136,,110,1,,{ bonus bMaxHP,500; bonus bMaxSP,200; skill "PF_SPIDERWEB",1; },{},{}
 2981,RingOfHero,Warrior's Ring,4,10,,200,,0,,0,0xFFFFFFFF,63,2,136,,160,,,{},{},{}
 2983,Greed_Brooch,Greed Brooch,4,10,,100,,,,1,0xFFFFFFFF,63,2,136,,50,1,,{ bonus2 bHPLossRate,10,5000; },{},{}
@@ -4604,11 +4604,12 @@
 6605,Muspellium,Muspellium,3,0,,0,,,,,,,,,,,,,{},{},{}
 6606,Cute_Cart_Coupon,Cute Cart Remodel Coupon,3,0,,10,,,,,,,,,,,,,{},{},{}
 6607,Temporal_Crystal,Temporal Crystal,3,20,,10,,,,,,,,,,,,,{},{},{}
-6608,Coagulated_Spell,Coagulated Spell,3,0,,0,,,,,,,,,,,,,{},{},{}
-6609,Glast_Decayed_Nail,Glast Decayed Nail,3,82,,10,,,,,,,,,,,,,{},{},{}
-6610,Glast_Horrendous_Mouth,Glast Horrendous Mouth,3,390,,10,,,,,,,,,,,,,{},{},{}
-6612,Gold_Coin_Basket,Gold Coin Basket,3,20,,200,,,,,,,,,,,,,{},{},{}
-6613,Flashy_Brooch,Flashy Brooch,3,20,,10,,,,,,,,,,,,,{},{},{}
+6608,Coagulated_Spell,Coagulated Spell,3,20,,10,,,,,,,,,,,,,{},{},{}
+6609,Glast_Decayed_Nail,Glast Decayed Nail,3,2800,,10,,,,,,,,,,,,,{},{},{}
+6610,Glast_Horrendous_Mouth,Glast Horrendous Mouth,3,3200,,10,,,,,,,,,,,,,{},{},{}
+6611,Colorful_Key,Colorful Key,3,50000,,10,,,,,,,,,,,,,{},{},{}
+6612,Gold_Coin_Basket,Gold Coin Basket,3,300000,,200,,,,,,,,,,,,,{},{},{}
+6613,Colorful_Brooch,Colorful Brooch,3,100000,,10,,,,,,,,,,,,,{},{},{}
 6615,Siege_Guild_Coin,Siege Guild Coin,3,0,,10,,,,,,,,,,,,,{},{},{}
 6616,Lmtd_Manny_Card,Limited Manny Card,3,20,,10,,,,,,,,,,,,,{},{},{}
 6617,Lmtd_Sid_Card,Limited Sid Card,3,20,,10,,,,,,,,,,,,,{},{},{}
