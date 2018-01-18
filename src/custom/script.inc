@@ -665,3 +665,20 @@ BUILDIN_FUNC(setrenttime)
 
 	return SCRIPT_CMD_SUCCESS;
 }
+
+/**
+ * 获得指定gid对象的目标
+ * getunittarget <unit_id>;
+ * @author [kuku]
+ */
+BUILDIN_FUNC(getunittarget)
+{
+	struct block_list *bl = NULL;
+	
+	if (script_rid2bl(2,bl))
+		script_pushint(st, battle_gettarget(bl));
+	else
+		script_pushint(st, -1);
+
+	return SCRIPT_CMD_SUCCESS;
+}
