@@ -627,7 +627,7 @@ BUILDIN_FUNC(setrenttime)
 		i = pc_checkequip(sd, equip_bitmask[num]);
 	else {
 		//提示装备位置不合法
-		ShowError("buildin_getequipexpiretick: Unknown equip index '%d'\n", num);
+		ShowError("buildin_setrenttime: Unknown equip index '%d'\n", num);
 		script_pushint(st, -1);
 		return SCRIPT_CMD_FAILURE;
 	}
@@ -668,7 +668,12 @@ BUILDIN_FUNC(setrenttime)
 
 /**
  * 获得指定gid对象的目标
- * getunittarget <unit_id>;
+ * getunittarget <GID>;
+ * @param GID: 需要查询的目标GID
+ * @return val:
+ *  -1 - GID对应的对象不存在
+ *  0  - 该对象无目标
+ *  >0 - 该对象的目标GID
  * @author [kuku]
  */
 BUILDIN_FUNC(getunittarget)
@@ -681,4 +686,90 @@ BUILDIN_FUNC(getunittarget)
 		script_pushint(st, -1);
 
 	return SCRIPT_CMD_SUCCESS;
+}
+
+/**
+ * 根据给定的GID的获取目标的地图名以及坐标
+ * getunitmapxy(<GID>,<map name>,<x>,<y>);
+ * @param GID: 需要查询的目标GID
+ * @param mapname: 字符串变量用于存放返回的地图名
+ * @param x: 整数变量用于存放X坐标
+ * @param y: 整数变量用于存放Y坐标
+ * @return val:
+ *  -1 - 发生错误
+ *  0  - 执行成功
+ * @author [kuku]
+ */
+BUILDIN_FUNC(getunitmapxy)
+{
+	struct block_list *bl = NULL;
+	TBL_PC *sd = NULL;
+	const char *name;
+	
+	int x,y;
+	char mapname[MAP_NAME_LENGTH];
+	
+	//判断传递的<map name>/<x>/<y>,3个参数是否为变量
+	if ( !data_isreference( script_getdata(st,3) ) ) {
+		ShowWarning("script: buildin_getunitmapxy: not mapname variable\n");
+		script_pushint(st,-1);
+		return SCRIPT_CMD_FAILURE;
+	}
+	if ( !data_isreference( script_getdata(st,4) ) ) {
+		ShowWarning("script: buildin_getunitmapxy: not mapx variable\n");
+		script_pushint(st,-1);
+		return SCRIPT_CMD_FAILURE;
+	}
+	if ( !data_isreference( script_getdata(st,5) ) ) {
+		ShowWarning("script: buildin_getunitmapxy: not mapy variable\n");
+		script_pushint(st,-1);
+		return SCRIPT_CMD_FAILURE;
+	}
+	
+	//判断GID对应的对象是否存在
+	if ( !script_rid2bl(2,bl) ) {
+		script_pushint(st, -1);
+		return SCRIPT_CMD_FAILURE;
+	}
+	
+	x = bl->x;
+	y = bl->y;
+	safestrncpy(mapname, map[bl->m].name, MAP_NAME_LENGTH);
+	
+	//设置MapName$
+	name = reference_getname( script_getdata(st, 3) );
+	if ( not_server_variable(*name) ) {
+		if ( !script_rid2sd(sd) ) {
+			ShowError( "buildin_getunitmapxy: variable '%s' for mapname is not a server variable, but no player is attached!", name );
+			return SCRIPT_CMD_FAILURE;
+		}
+	}
+	setd_sub(st, sd, name, 0, (void*)mapname, script_getref(st,3));
+
+	//设置MapX
+	name = reference_getname( script_getdata(st, 4) );
+	sd = NULL;
+	if ( not_server_variable(*name) ) {
+		if ( !script_rid2sd(sd) ) {
+			ShowError( "buildin_getunitmapxy: variable '%s' for mapX is not a server variable, but no player is attached!", name );
+			return SCRIPT_CMD_FAILURE;
+		}
+	}
+	setd_sub(st, sd, name, 0, (void*)__64BPRTSIZE(x), script_getref(st,4));
+
+	//设置MapY
+	name = reference_getname( script_getdata(st, 5) );
+	sd = NULL;
+	if ( not_server_variable(*name) ) {
+		if ( !script_rid2sd(sd) ) {
+			ShowError( "buildin_getunitmapxy: variable '%s' for mapY is not a server variable, but no player is attached!", name );
+			return SCRIPT_CMD_FAILURE;
+		}
+	}
+	setd_sub(st, sd, name, 0, (void*)__64BPRTSIZE(y), script_getref(st,5));
+
+	//成功返回0
+	script_pushint(st,0);
+	return SCRIPT_CMD_SUCCESS;
+	
 }
