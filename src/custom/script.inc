@@ -671,9 +671,9 @@ BUILDIN_FUNC(setrenttime)
  * getunittarget <GID>;
  * @param GID: 需要查询的目标GID
  * @return val:
- *  -1 - GID对应的对象不存在
- *  0  - 该对象无目标
- *  >0 - 该对象的目标GID
+ *   -1 - GID对应的对象不存在
+ *   0  - 该对象无目标
+ *   >0 - 该对象的目标GID
  * @author [kuku]
  */
 BUILDIN_FUNC(getunittarget)
@@ -696,8 +696,8 @@ BUILDIN_FUNC(getunittarget)
  * @param x: 整数变量用于存放X坐标
  * @param y: 整数变量用于存放Y坐标
  * @return val:
- *  -1 - 发生错误
- *  0  - 执行成功
+ *   -1 - 发生错误
+ *   0  - 执行成功
  * @author [kuku]
  */
 BUILDIN_FUNC(getunitmapxy)
@@ -772,4 +772,87 @@ BUILDIN_FUNC(getunitmapxy)
 	script_pushint(st,0);
 	return SCRIPT_CMD_SUCCESS;
 	
+}
+
+
+/**
+ * 让指定GID的怪物使用技能
+ * mobskill <GID>,<Skill ID>,<Skill Lv>,<Cast Time>,<Cancelable>,<Target Type>{,<x>,<y>};
+ * mobskill <GID>,<"Skill Name">,<Skill Lv>,<Cast Time>,<Cancelable>,<Target Type>{,<x>,<y>};
+ * @param GID: 需要释放技能的怪物GID
+ * @param Skill ID/"Skill Name": 技能id/技能名称
+ * @param Skill Lv: 技能等级
+ * @param Cast Time: 咏唱时间(秒)
+ * @param Cancelable: 是否能被打断
+ *   0: 不可打断
+ *   1: 可以打断 
+ * @param Target Type: 目标类型
+ *   0: 自己
+ *   1: 怪物当前目标
+ *   2: 怪物的主人
+ *   3: 随机目标
+ * @param x: 地面技能的x坐标
+ * @param y: 地面技能的y坐标
+ * @author [kuku]
+ */
+BUILDIN_FUNC(mobskill)
+{
+	struct script_data *data;
+	struct block_list *bl,*tbl;
+	TBL_MOB *md;
+	int skill_id,skill_lv,casttime,target,cancel,x,y;
+	
+	data = script_getdata(st, 3);
+	get_val(st, data); // Convert into value in case of a variable
+	skill_id = ( data_isstring(data) ? skill_name2id(script_getstr(st,3)) : script_getnum(st,3) );
+	
+	if( (skill_lv = script_getnum(st,4)) > battle_config.mob_max_skilllvl )
+		skill_lv = battle_config.mob_max_skilllvl;
+	
+	casttime = script_getnum(st,5);
+	cancel = script_getnum(st,6);
+	target = script_getnum(st,7);
+	
+	if ( !script_rid2bl(2,bl) )
+		return SCRIPT_CMD_SUCCESS;
+	
+	//GID对应对象必须为怪物
+	if ( bl->type != BL_MOB )
+		return SCRIPT_CMD_SUCCESS;
+	
+	md = (TBL_MOB*)bl;
+	
+	// 0:自己, 1:目标, 2:主人, default:随机目标
+	switch( target ) {
+	case 0:
+		tbl = map_id2bl(md->bl.id);
+		break;
+	case 1:
+		tbl = map_id2bl(md->target_id);
+		break;
+	case 2:
+		tbl = map_id2bl(md->master_id);
+		break;
+	default:
+		tbl = battle_getenemy(&md->bl, DEFAULT_ENEMY_TYPE(md), skill_get_range2(&md->bl, skill_id, skill_lv, true));
+		break;
+	}
+	
+	//没有目标则退出
+	if ( !tbl )
+		return SCRIPT_CMD_SUCCESS;
+	
+	//如果怪物正在咏唱则取消目前释放的技能
+	if ( md->ud.skilltimer != INVALID_TIMER )
+		unit_skillcastcancel(bl,0);
+	
+	//如果是地面技能则在目标位置或指定位置释放技能,否则使用单体技能
+	if ( skill_get_casttype(skill_id) == CAST_GROUND ) {
+		x = script_hasdata(st, 8) ? script_getnum(st, 8) : tbl->x;
+		y = script_hasdata(st, 9) ? script_getnum(st, 9) : tbl->y;
+		unit_skilluse_pos2(&md->bl, x, y, skill_id, skill_lv, casttime * 1000, cancel);
+	} else
+		unit_skilluse_id2(&md->bl, tbl->id, skill_id, skill_lv, casttime * 1000, cancel);
+	
+	return SCRIPT_CMD_SUCCESS;
 }
