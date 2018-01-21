@@ -18,10 +18,16 @@
 //	return 0;
 //}
 
-/*
-* 根据GID让指定对象显示effect
-* uniteffect <GID>,<effect number>{,<send_target>}
-*/
+/**
+ * 根据GID让指定对象显示effect
+ * uniteffect <GID>,<effect number>{,<send_target>};
+ * @param GID: 指定对象的GID
+ * @param effect number: 特效的编号或常量值
+ * @param send_target: 显示的目标对象
+ *    SELF: 自己
+ *    AREA: 附近所有对象
+ * @author [kuku]
+ */
 BUILDIN_FUNC(uniteffect) {
 	struct block_list* bl;
 	//effect编号
@@ -34,9 +40,18 @@ BUILDIN_FUNC(uniteffect) {
 	return SCRIPT_CMD_SUCCESS;
 }
 
-/*根据gid删除对象
-* unitremove <GID>{,<Type>};
-*/
+/**
+ * 根据gid删除对象
+ * unitremove <GID>{,<Type>};
+ * @param GID: 指定对象的GID
+ * @param Type: 移除时显示的动画类型
+ *   0 = CLR_OUTSIGHT/超出视野淡出 (default)
+ *   1 = CLR_DEAD/死亡特效
+ *   2 = CLR_RESPAWN/下线光柱
+ *   3 = CLR_TELEPORT/传送光柱
+ *   4 = CLR_TRICKDEAD/无效果
+ * @author [kuku]
+ */
 BUILDIN_FUNC(unitremove)
 {
 	struct block_list *bl;
@@ -104,10 +119,13 @@ BUILDIN_FUNC(unitremove)
 }
 
 
-/* 获得指定区域内的所有GID
-* getareagid("<地图名>",<类型>,<x0>,<y0>,<x1>,<y1>,<arrayname>);
-* getareagid("<地图名>",<类型>,<中心坐标x>,<中心坐标y>,<半径>,<arrayname>);
-* getareagid("<地图名>",<类型>,<arrayname>);
+/**
+ * 获得指定区域内的所有GID
+ * getareagid("<地图名>",<类型>,<x0>,<y0>,<x1>,<y1>,<arrayname>);
+ * getareagid("<地图名>",<类型>,<中心坐标x>,<中心坐标y>,<半径>,<arrayname>);
+ * getareagid("<地图名>",<类型>,<arrayname>);
+ * param arrayname: 用于存放gid的数组
+ * @author [kuku]
 */
 static int buildin_getareagid_sub(struct block_list *bl, va_list ap)
 {
@@ -493,7 +511,16 @@ BUILDIN_FUNC(getinventoryinfo)
 	return SCRIPT_CMD_SUCCESS;
 }
 
-
+/**
+ * 查找某内容在数组中首次出现的索引
+ * searcharray <array>,<search content>;
+ * @param array: 需要搜索的数组变量名
+ * @param search content: 需要搜索的内容(整数或字符串)
+ * @return val:
+ *    -1: 查询失败
+ *    >=0: 索引位置
+ * @author [kuku]
+ */
 //searcharray <数组名>,<搜索的内容(可以是字符串或是数字)>
 //成功范围第一个搜索到的索引,失败返回-1
 BUILDIN_FUNC(searcharray)
@@ -567,8 +594,13 @@ BUILDIN_FUNC(searcharray)
 	return SCRIPT_CMD_SUCCESS;
 }
 
-
-//getequipexpiretick <装备位置编号>{,<角色编号>};
+/**
+ * 获取指定位置装备的剩余租赁时间
+ * getequipexpiretick <equipment slot>{,<char_id>};
+ * @param equipment slot: 装备位置编号
+ * @param char_id: 指定人物的cid, 不写默认为当前脚本关联人物
+ * @author [kuku]
+ */
 BUILDIN_FUNC(getequipexpiretick)
 {
 	TBL_PC* sd;
@@ -605,8 +637,14 @@ BUILDIN_FUNC(getequipexpiretick)
 	return SCRIPT_CMD_SUCCESS;
 }
 
-
-//setrenttime <装备位置编号>,<增减的时间秒数>{,<角色编号>};
+/**
+ * 增减指定位置装备的租赁时间
+ * setrenttime <equipment slot>,<time>{,<char_id>};
+ * @param equipment slot: 装备位置编号
+ * @param time: 增减的时间(秒)
+ * @param char_id: 指定人物的cid, 不写默认为当前脚本关联人物
+ * @author [kuku]
+ */
 BUILDIN_FUNC(setrenttime)
 {
 	TBL_PC* sd;
@@ -690,11 +728,11 @@ BUILDIN_FUNC(getunittarget)
 
 /**
  * 根据给定的GID的获取目标的地图名以及坐标
- * getunitmapxy(<GID>,<map name>,<x>,<y>);
+ * getunitmapxy(<GID>,<variable for map name>,<variable for x>,<variable for y>);
  * @param GID: 需要查询的目标GID
- * @param mapname: 字符串变量用于存放返回的地图名
- * @param x: 整数变量用于存放X坐标
- * @param y: 整数变量用于存放Y坐标
+ * @param variable for map name: 字符串变量用于存放返回的地图名
+ * @param variable for x: 整数变量用于存放X坐标
+ * @param variable for y: 整数变量用于存放Y坐标
  * @return val:
  *   -1 - 发生错误
  *   0  - 执行成功
@@ -777,8 +815,8 @@ BUILDIN_FUNC(getunitmapxy)
 
 /**
  * 让指定GID的怪物使用技能
- * mobskill <GID>,<Skill ID>,<Skill Lv>,<Cast Time>,<Cancelable>,<Target Type>{,<x>,<y>};
- * mobskill <GID>,<"Skill Name">,<Skill Lv>,<Cast Time>,<Cancelable>,<Target Type>{,<x>,<y>};
+ * mobskill <GID>,<Skill ID>,<Skill Lv>,<Cast Time>,<Cancelable>,<Target Type>{,<Offset x>,<Offset y>};
+ * mobskill <GID>,<"Skill Name">,<Skill Lv>,<Cast Time>,<Cancelable>,<Target Type>{,<Offset x>,<Offset y>};
  * @param GID: 需要释放技能的怪物GID
  * @param Skill ID/"Skill Name": 技能id/技能名称
  * @param Skill Lv: 技能等级
@@ -791,8 +829,8 @@ BUILDIN_FUNC(getunitmapxy)
  *   1: 怪物当前目标
  *   2: 怪物的主人
  *   3: 随机目标
- * @param x: 地面技能的x坐标
- * @param y: 地面技能的y坐标
+ * @param Offset x: 地面技能相对于目标坐标x轴的偏移量
+ * @param Offset y: 地面技能相对于目标坐标y轴的偏移量
  * @author [kuku]
  */
 BUILDIN_FUNC(mobskill)
@@ -800,7 +838,7 @@ BUILDIN_FUNC(mobskill)
 	struct script_data *data;
 	struct block_list *bl,*tbl;
 	TBL_MOB *md;
-	int skill_id,skill_lv,casttime,target,cancel,x,y;
+	int skill_id,skill_lv,casttime,target,cancel,offsetx,offsety;
 	
 	data = script_getdata(st, 3);
 	get_val(st, data); // Convert into value in case of a variable
@@ -846,11 +884,11 @@ BUILDIN_FUNC(mobskill)
 	if ( md->ud.skilltimer != INVALID_TIMER )
 		unit_skillcastcancel(bl,0);
 	
-	//如果是地面技能则在目标位置或指定位置释放技能,否则使用单体技能
+	//如果是地面技能则在目标位置或指定偏移的位置释放技能,否则使用单体技能
 	if ( skill_get_casttype(skill_id) == CAST_GROUND ) {
-		x = script_hasdata(st, 8) ? script_getnum(st, 8) : tbl->x;
-		y = script_hasdata(st, 9) ? script_getnum(st, 9) : tbl->y;
-		unit_skilluse_pos2(&md->bl, x, y, skill_id, skill_lv, casttime * 1000, cancel);
+		offsetx = script_hasdata(st, 8) ? script_getnum(st, 8) : 0;
+		offsety = script_hasdata(st, 9) ? script_getnum(st, 9) : 0;
+		unit_skilluse_pos2(&md->bl, tbl->x + offsetx, tbl->y + offsety, skill_id, skill_lv, casttime * 1000, cancel);
 	} else
 		unit_skilluse_id2(&md->bl, tbl->id, skill_id, skill_lv, casttime * 1000, cancel);
 	
