@@ -894,3 +894,46 @@ BUILDIN_FUNC(mobskill)
 	
 	return SCRIPT_CMD_SUCCESS;
 }
+
+/**
+ * 将制定的GID对象向指定方向击退一定格数
+ * pushunit <GID>,<dir>,<cells>;
+ * @param GID: 需要击退目标的GID
+ * @param dir: 击退方向
+ * @param cells: 击退格数
+ */
+BUILDIN_FUNC(pushunit)
+{
+	struct block_list *bl;
+	uint8 dir;
+	int cells, dx, dy;
+	
+	//GID不存在则退出
+	if(!script_rid2bl(2,bl))
+		return SCRIPT_CMD_FAILURE;
+	
+	dir = script_getnum(st,3);
+	cells = script_getnum(st,4);
+
+	if (dir >= DIR_MAX) {
+		ShowWarning("buildin_pushpc: Invalid direction %d specified.\n", dir);
+		script_reportsrc(st);
+
+		dir%= DIR_MAX;  // trim spin-over
+	}
+
+	if (!cells) {
+		// zero distance
+		return SCRIPT_CMD_SUCCESS;
+	}
+	else if (cells < 0) {// pushing backwards
+		dir = (dir+DIR_MAX/2)%DIR_MAX;  // turn around
+		cells = -cells;
+	}
+
+	dx = dirx[dir];
+	dy = diry[dir];
+
+	unit_blown(bl, dx, dy, cells, BLOWN_NONE);
+	return SCRIPT_CMD_SUCCESS;
+}
