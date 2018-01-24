@@ -226,34 +226,36 @@ BUILDIN_FUNC(script4each) {
 	struct script_code *script = NULL;
 
 	const char *script_str = NULL, *mapname = NULL;
+	struct party_data *p = NULL;
+	struct guild *g = NULL;
 	int type, map_id;
 
 	//获得执行脚本(去空格)
 	script_str = skip_space(script_getstr(st, 2));
 	//检查脚本格式,其实可以不写,parse_script也会检查格式
-	if (script_str == NULL || (script_str[0] && script_str[0] != '{' && script_str[strlen(script_str) - 1] != '}'))
-		return SCRIPT_CMD_SUCCESS;
+	if ( script_str == NULL || (script_str[0] && script_str[0] != '{' && script_str[strlen(script_str) - 1] != '}') )
+		return SCRIPT_CMD_FAILURE;
 
 	if ( !( script = parse_script(script_str, "script4each", 0, 0) ) )
-		return SCRIPT_CMD_SUCCESS;
+		return SCRIPT_CMD_FAILURE;
 
 	type = script_getnum(st, 3);
-	//如果超出0-7的范围则失败
-
-	switch (type) {
+	
+	switch( type ) {
 	case 0:
 		//获得服务器所有人物的迭代器
 		iter = mapit_getallusers();
 		//遍历迭代器
 		for (pl_sd = (TBL_PC*)mapit_first(iter); mapit_exists(iter); pl_sd = (TBL_PC*)mapit_next(iter))
 			run_script(script, 0, pl_sd->bl.id, 0);
+		//释放迭代器
 		mapit_free(iter);
 		break;
 	case 1:
 		mapname = script_getstr(st, 4);
 		map_id = map_mapname2mapid(mapname);
 		if (map_id < 0)
-			return SCRIPT_CMD_SUCCESS;
+			break;
 		map_foreachinmap(buildin_script4each_sub, map_id, BL_PC, script);
 		break;
 	case 2:
@@ -262,7 +264,7 @@ BUILDIN_FUNC(script4each) {
 		mapname = script_getstr(st, 4);
 		map_id = map_mapname2mapid(mapname);
 		if (map_id < 0)
-			return SCRIPT_CMD_SUCCESS;
+			break;
 		center.m = map_id;
 		center.x = script_getnum(st, 5);
 		center.y = script_getnum(st, 6);
@@ -271,30 +273,40 @@ BUILDIN_FUNC(script4each) {
 		map_foreachinrange(buildin_script4each_sub, &center, range, BL_PC, script);
 		break;
 	case 3:
-		script_charid2sd(5, sd);
-		iter = mapit_getallusers();
-		for (pl_sd = (TBL_PC*)mapit_first(iter); mapit_exists(iter); pl_sd = (TBL_PC*)mapit_next(iter)) {
-			if (pl_sd->status.party_id == sd->status.party_id)
+		//根据给定的charid获取sd,sd不存在则退出
+		if ( !script_charid2sd(4, sd) )
+			break;
+		
+		//根据人物的队伍id获取队伍信息
+		if ( !(p = party_search(sd->status.party_id)) )
+			break;
+		
+		for(int i = 0; i < MAX_PARTY; i++) {
+			if ( pl_sd = map_charid2sd(p->party.member[i].char_id) )
 				run_script(script, 0, pl_sd->bl.id, 0);
 		}
-		mapit_free(iter);
 		break;
 	case 4:
-		script_charid2sd(5, sd);
-		iter = mapit_getallusers();
-		for (pl_sd = (TBL_PC*)mapit_first(iter); mapit_exists(iter); pl_sd = (TBL_PC*)mapit_next(iter)) {
-			if (pl_sd->status.guild_id == sd->status.guild_id)
+		//根据给定的charid获取sd,sd不存在则退出
+		if ( !script_charid2sd(4, sd) )
+			break;
+		
+		//根据人物的公会id获取公会信息
+		if ( !(g = guild_search(sd->status.guild_id)) )
+			break;
+		
+		for(int i = 0; i < MAX_GUILD; i++) {
+			if ( pl_sd = map_charid2sd(g->member[i].char_id) )
 				run_script(script, 0, pl_sd->bl.id, 0);
 		}
-		mapit_free(iter);
 		break;
 	case 5:
 		int x0, y0, x1, y1;
 		mapname = script_getstr(st, 4);
+		//根据地图名获得地图id
 		map_id = map_mapname2mapid(mapname);
-		if (map_id < 0) {
-			return SCRIPT_CMD_SUCCESS;
-		}
+		if (map_id < 0)
+			break;
 		x0 = script_getnum(st, 5);
 		y0 = script_getnum(st, 6);
 		x1 = script_getnum(st, 7);
@@ -305,24 +317,36 @@ BUILDIN_FUNC(script4each) {
 	case 6:
 		int party_id;
 		party_id = script_getnum(st, 4);
-		iter = mapit_getallusers();
-		for (pl_sd = (TBL_PC*)mapit_first(iter); mapit_exists(iter); pl_sd = (TBL_PC*)mapit_next(iter)) {
-			if (pl_sd->status.party_id == party_id)
+		
+		//根据人物的队伍id获取队伍信息
+		if ( !(p = party_search(party_id)) )
+			break;
+		
+		for(int i = 0; i < MAX_PARTY; i++) {
+			if ( pl_sd = map_charid2sd(p->party.member[i].char_id) )
 				run_script(script, 0, pl_sd->bl.id, 0);
 		}
-		mapit_free(iter);
 		break;
 	case 7:
 		int guild_id;
 		guild_id = script_getnum(st, 4);
-		iter = mapit_getallusers();
-		for (pl_sd = (TBL_PC*)mapit_first(iter); mapit_exists(iter); pl_sd = (TBL_PC*)mapit_next(iter)) {
-			if (pl_sd->status.guild_id == guild_id)
+		
+		//根据人物的公会id获取公会信息
+		if ( !(g = guild_search(sd->status.guild_id)) )
+			break;
+		
+		for(int i = 0; i < MAX_GUILD; i++) {
+			if ( pl_sd = map_charid2sd(g->member[i].char_id) )
 				run_script(script, 0, pl_sd->bl.id, 0);
 		}
-		mapit_free(iter);
 		break;
 	}
+	//如果超出0-7的范围则直接退出
+	
+	//释放脚本对象
+	if (script)
+		script_free_code(script);
+	
 	return SCRIPT_CMD_SUCCESS;
 }
 
