@@ -11,4 +11,4 @@
  *	 { "name", &battle_config.<variable name>, <default value>, <minimum value>, <maximum value> },
  **/
 
-
+	{ "mvp_tomb_name_type",                &battle_config.mvp_tomb_name_type,             1,      0,      1,    },

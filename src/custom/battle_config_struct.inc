@@ -11,4 +11,4 @@
  * Format:
  *	 <datatype> name;
  **/
-
+	int mvp_tomb_name_type; //设置mob tomb上怪物名称类型, 0: name 1: jname [kuku]
