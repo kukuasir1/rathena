@@ -961,3 +961,23 @@ BUILDIN_FUNC(pushunit)
 	unit_blown(bl, dx, dy, cells, BLOWN_NONE);
 	return SCRIPT_CMD_SUCCESS;
 }
+
+//½ûÖ¹npcµã»÷
+BUILDIN_FUNC(disable_click)
+{
+	TBL_NPC* nd;
+	nd = map_id2nd(st->oid);
+	if (nd)
+		nd->clickable = false;
+	return SCRIPT_CMD_SUCCESS;
+}
+
+//ÔÊÐínpcµã»÷
+BUILDIN_FUNC(enable_click)
+{
+	TBL_NPC* nd;
+	nd = map_id2nd(st->oid);
+	if (nd)
+		nd->clickable = true;
+	return SCRIPT_CMD_SUCCESS;
+}

@@ -100,6 +100,8 @@ struct npc_data {
 		unsigned int timeout;
 		unsigned long color;
 	} progressbar;
+
+	bool clickable; //npcÊÇ·ñÄÜµã»÷ [kuku]
 };
 
 struct eri;
