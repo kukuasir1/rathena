@@ -962,21 +962,41 @@ BUILDIN_FUNC(pushunit)
 	return SCRIPT_CMD_SUCCESS;
 }
 
-//禁止npc点击
+/*
+ * 禁止npc点击
+ * disable_click {"<NPC_name>"};
+ * @param NPC_name: NPC名
+ * @author [kuku]
+ */
 BUILDIN_FUNC(disable_click)
 {
 	TBL_NPC* nd;
-	nd = map_id2nd(st->oid);
+	
+	if (script_hasdata(st, 2) && strlen(script_getstr(st, 2)) > 0)
+		nd = npc_name2id(script_getstr(st, 2));
+	else
+		nd = map_id2nd(st->oid);
+	
 	if (nd)
 		nd->clickable = false;
 	return SCRIPT_CMD_SUCCESS;
 }
 
-//允许npc点击
+/*
+ * 允许npc点击
+ * enable_click {"<NPC_name>"};
+ * @param NPC_name: NPC名
+ * @author [kuku]
+ */
 BUILDIN_FUNC(enable_click)
 {
 	TBL_NPC* nd;
-	nd = map_id2nd(st->oid);
+	
+	if (script_hasdata(st, 2) && strlen(script_getstr(st, 2)) > 0)
+		nd = npc_name2id(script_getstr(st, 2));
+	else
+		nd = map_id2nd(st->oid);
+	
 	if (nd)
 		nd->clickable = true;
 	return SCRIPT_CMD_SUCCESS;
