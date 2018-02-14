@@ -8,7 +8,7 @@
  * For detailed guidance on these check http://rathena.org/wiki/SRC/config/
  **/
 //客户端登陆器版本
-#define PACKETVER 20170614
+#define PACKETVER 20180124
 
 //封包加密的3个秘钥
 #define PACKET_OBFUSCATION_KEY1 0x2124cb58
