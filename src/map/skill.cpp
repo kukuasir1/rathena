@@ -9013,7 +9013,6 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 	case NPC_WIDE_DEEP_SLEEP:
 	case NPC_WIDESIREN:
 	case NPC_WIDEWEB:
-	case NPC_WIDESUCK:
 		if (flag&1){
 			switch ( type ) {
 			case SC_BURNING:
@@ -11775,10 +11774,10 @@ int skill_castend_pos2(struct block_list* src, int x, int y, uint16 skill_id, ui
 #endif
 	case NPC_EVILLAND:
 	case NPC_VENOMFOG:
-	//case NPC_COMET:
 	case NPC_ICEMINE:
 	case NPC_FLAMECROSS:
 	case NPC_HELLBURNING:
+	case NPC_WIDESUCK:
 	case RA_ELECTRICSHOCKER:
 	case RA_CLUSTERBOMB:
 	case RA_MAGENTATRAP:
@@ -13727,6 +13726,16 @@ int skill_unit_onplace_timer(struct skill_unit *unit, struct block_list *bl, uns
 					if (rnd()%100 < unit->val1)
 						skill_attack(BF_WEAPON,ss,&unit->bl,bl,sg->skill_id,sg->skill_lv,tick,0);
 					break;
+				case NPC_WIDESUCK: {
+					int heal = (int)skill_attack(skill_get_type(sg->skill_id), ss, &unit->bl, bl, sg->skill_id, sg->skill_lv, tick, 0);
+
+					if (heal > 0) {
+						clif_skill_nodamage(ss, bl, skill_id, sg->skill_lv, 1);
+						clif_skill_nodamage(NULL, ss, AL_HEAL, heal, 1);
+						status_heal(ss, heal, 0, 0);
+					}
+				}
+				break;
 				case SU_CN_METEOR:
 					if (sg->val1)
 						skill_area_temp[3] = 1;

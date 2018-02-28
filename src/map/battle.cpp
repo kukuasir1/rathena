@@ -6555,6 +6555,9 @@ struct Damage battle_calc_misc_attack(struct block_list *src,struct block_list *
 		case NPC_EVILLAND:
 			md.damage = skill_calc_heal(src,target,skill_id,skill_lv,false);
 			break;
+		case NPC_WIDESUCK:
+			md.damage = tstatus->max_hp * 15 / 100;
+			break;
 		case ASC_BREAKER:
 #ifdef RENEWAL
 			// Official Renewal formula [helvetica]
