@@ -604,6 +604,13 @@ char storage_guild_storageopen(struct map_session_data* sd)
 	if( gstor->lock )
 		return 1;
 
+	//0x100 guild storage [kuku]
+	if (!(sd->guild->position[guild_getposition(sd)].mode & 0x100)) {
+		clif_displaymessage(sd->fd, msg_txt(sd, 1600));
+		return 1;
+	}
+		
+
 	gstor->status = true;
 	sd->state.storage_flag = 2;
 	storage_sortitem(gstor->u.items_guild, ARRAYLENGTH(gstor->u.items_guild));

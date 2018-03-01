@@ -1099,7 +1099,8 @@ int guild_change_position(int guild_id,int idx,
 	exp_mode = cap_value(exp_mode, 0, battle_config.guild_exp_limit);
 	//Mode 0x01 <- Invite
 	//Mode 0x10 <- Expel.
-	p.mode=mode&0x11;
+	//Mode 0x100 <- Guild storage [kuku]
+	p.mode=mode&0x111;
 	p.exp_mode=exp_mode;
 	safestrncpy(p.name,name,NAME_LENGTH);
 	return intif_guild_position(guild_id,idx,&p);
