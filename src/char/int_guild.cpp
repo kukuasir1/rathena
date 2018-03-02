@@ -1164,12 +1164,12 @@ int mapif_parse_CreateGuild(int fd,uint32 account_id,char *name,struct guild_mem
 	g->member[0].modified = GS_MEMBER_MODIFIED;
 
 	// Set default positions
-	g->position[0].mode=0x11;
-	strcpy(g->position[0].name,"GuildMaster");
-	strcpy(g->position[MAX_GUILDPOSITION-1].name,"Newbie");
+	g->position[0].mode=0x111; //add guild storage permission[kuku]
+	strcpy(g->position[0].name, msg_txt(300));//Guild Master
+	strcpy(g->position[MAX_GUILDPOSITION-1].name, msg_txt(301));//NewBie
 	g->position[0].modified = g->position[MAX_GUILDPOSITION-1].modified = GS_POSITION_MODIFIED;
 	for(i=1;i<MAX_GUILDPOSITION-1;i++) {
-		sprintf(g->position[i].name,"Position %d",i+1);
+		sprintf(g->position[i].name, msg_txt(302),i+1);//Position %d
 		g->position[i].modified = GS_POSITION_MODIFIED;
 	}
 

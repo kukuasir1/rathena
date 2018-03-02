@@ -579,6 +579,7 @@ void storage_guild_delete(int guild_id)
 char storage_guild_storageopen(struct map_session_data* sd)
 {
 	struct s_storage *gstor;
+	int i;
 
 	nullpo_ret(sd);
 
@@ -604,9 +605,9 @@ char storage_guild_storageopen(struct map_session_data* sd)
 	if( gstor->lock )
 		return 1;
 
-	//0x100 guild storage [kuku]
-	if (!(sd->guild->position[guild_getposition(sd)].mode & 0x100)) {
-		clif_displaymessage(sd->fd, msg_txt(sd, 1600));
+	//0x100 guild storage permission [kuku]
+	if ((i = guild_getposition(sd)) < 0 || !(sd->guild->position[i].mode & 0x100)) {
+		clif_msg(sd, 2501);
 		return 1;
 	}
 		
