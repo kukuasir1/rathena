@@ -13883,7 +13883,7 @@ BUILDIN_FUNC(petloot)
 BUILDIN_FUNC(getinventorylist)
 {
 	TBL_PC *sd;
-	char card_var[NAME_LENGTH];
+	char card_var[NAME_LENGTH], randopt_var[50];
 	int i,j=0,k;
 
 	if (!script_charid2sd(2,sd))
@@ -13910,6 +13910,15 @@ BUILDIN_FUNC(getinventorylist)
 			}
 			pc_setreg(sd,reference_uid(add_str("@inventorylist_expire"), j),sd->inventory.u.items_inventory[i].expire_time);
 			pc_setreg(sd,reference_uid(add_str("@inventorylist_bound"), j),sd->inventory.u.items_inventory[i].bound);
+			for (k = 0; k < MAX_ITEM_RDM_OPT; k++)
+			{
+				sprintf(randopt_var, "@inventorylist_option_id%d",k+1);
+				pc_setreg(sd,reference_uid(add_str(randopt_var), j),sd->inventory.u.items_inventory[i].option[k].id);
+				sprintf(randopt_var, "@inventorylist_option_value%d",k+1);
+				pc_setreg(sd,reference_uid(add_str(randopt_var), j),sd->inventory.u.items_inventory[i].option[k].value);
+				sprintf(randopt_var, "@inventorylist_option_parameter%d",k+1);
+				pc_setreg(sd,reference_uid(add_str(randopt_var), j),sd->inventory.u.items_inventory[i].option[k].param);
+			}
 			j++;
 		}
 	}
@@ -23401,6 +23410,10 @@ BUILDIN_FUNC(unloadnpc) {
 
 	if( nd == NULL ){
 		ShowError( "buildin_unloadnpc: npc '%s' was not found.\n", name );
+		return SCRIPT_CMD_FAILURE;
+	} else if ( nd->bl.id == st->oid ) {
+		// Supporting self-unload isn't worth the problem it may cause. [Secret]
+		ShowError("buildin_unloadnpc: You cannot self-unload NPC '%s'.\n.", name);
 		return SCRIPT_CMD_FAILURE;
 	}
 

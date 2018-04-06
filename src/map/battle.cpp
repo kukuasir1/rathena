@@ -3332,12 +3332,16 @@ static struct Damage battle_calc_multi_attack(struct Damage wd, struct block_lis
 	if( sd && !skill_id ) {	// if no skill_id passed, check for double attack [helvetica]
 		short i;
 		if( ( ( skill_lv = pc_checkskill(sd,TF_DOUBLE) ) > 0 && sd->weapontype1 == W_DAGGER )
-			|| ( sd->bonus.double_rate > 0 && sd->weapontype1 != W_FIST ) //Will fail bare-handed
-			|| ( sc && sc->data[SC_KAGEMUSYA] && sd->weapontype1 != W_FIST )) // Need confirmation
+			|| ( sd->bonus.double_rate > 0 && sd->weapontype1 != W_FIST ) // Will fail bare-handed
+			|| ( sc && sc->data[SC_KAGEMUSYA] && sd->weapontype1 != W_FIST )) // Will fail bare-handed
 		{	//Success chance is not added, the higher one is used [Skotlex]
-                        int max_rate = max(5*skill_lv,sd->bonus.double_rate);
-                        if(sc && sc->data[SC_KAGEMUSYA]) max_rate= max(max_rate,sc->data[SC_KAGEMUSYA]->val1*3);
-                        
+			int max_rate = 0;
+
+			if (sc && sc->data[SC_KAGEMUSYA])
+				max_rate = sc->data[SC_KAGEMUSYA]->val1 * 10; // Same rate as even levels of TF_DOUBLE
+			else
+				max_rate = max(5 * skill_lv, sd->bonus.double_rate);
+
 			if( rnd()%100 < max_rate ) {
 				wd.div_ = skill_get_num(TF_DOUBLE,skill_lv?skill_lv:1);
 				wd.type = DMG_MULTI_HIT;
@@ -6887,7 +6891,7 @@ int64 battle_calc_return_damage(struct block_list* bl, struct block_list *src, i
 	ssc = status_get_sc(src);
 
 	if (flag & BF_SHORT) {//Bounces back part of the damage.
-		if ( !status_reflect && sd && sd->bonus.short_weapon_damage_return ) {
+		if ( sd && sd->bonus.short_weapon_damage_return ) {
 			rdamage += damage * sd->bonus.short_weapon_damage_return / 100;
 			rdamage = i64max(rdamage,1);
 		} else if( status_reflect && sc && sc->count ) {
