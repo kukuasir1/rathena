@@ -6246,7 +6246,9 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
 					case NPC_COMET:
 						i = (sc ? distance_xy(target->x, target->y, sc->comet_x, sc->comet_y) : 8) / 2;
 						i = cap_value(i, 1, 4);
-						skillratio = 2500 + ((skill_lv - i) * 500);
+						//ra公式攻 skillratio = 2500 + ((skill_lv - i) * 500);
+						//根据aegis的数据攻击力差500
+						skillratio = 2500 + ((skill_lv - i + 1) * 500);
 						break;
 					case NPC_PULSESTRIKE2:
 						skillratio += 100;
