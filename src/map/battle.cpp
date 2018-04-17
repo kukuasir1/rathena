@@ -6246,15 +6246,9 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
 						skillratio += 600 + 100 * skill_lv;
 						break;
 					case NPC_COMET:
-						i = (sc ? distance_xy(target->x, target->y, sc->comet_x, sc->comet_y) : 8);
-						if (i <= 3)
-							skillratio += 2400 + 500 * skill_lv;
-						else if (i <= 5)
-							skillratio += 1900 + 500 * skill_lv;
-						else if (i <= 7)
-							skillratio += 1400 + 500 * skill_lv;
-						else
-							skillratio += 900 + 500 * skill_lv;
+						i = (sc ? distance_xy(target->x, target->y, sc->comet_x, sc->comet_y) : 8) / 2;
+						i = cap_value(i, 1, 4);
+						skillratio = 2500 + ((skill_lv - i) * 500);
 						break;
 					case NPC_PULSESTRIKE2:
 						skillratio += 100;

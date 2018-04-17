@@ -3915,6 +3915,7 @@
 	export_constant(IG_CHRISTMAS_BOX);
 	export_constant(IG_SPECIAL_CHRISTMAS_BOX);
 	export_constant(IG_SANTA_GIFT);
+	export_constant(IG_PRIZEOFHERO);
 
 	/* unit stop walking */
 	export_constant(USW_NONE);

@@ -552,6 +552,7 @@ void initChangeTables(void)
 	set_sc( NPC_WIDEHELLDIGNITY	, SC_HELLPOWER		, SI_HELLPOWER		, SCB_NONE );
 	set_sc( NPC_INVINCIBLE		, SC_INVINCIBLE		, SI_INVINCIBLE		, SCB_SPEED );
 	set_sc( NPC_INVINCIBLEOFF	, SC_INVINCIBLEOFF	, SI_BLANK		, SCB_SPEED );
+	set_sc( NPC_COMET            , SC_BURNING         , SI_BURNT           , SCB_MDEF );
 	set_sc_with_vfx( NPC_MAXPAIN	,	 SC_MAXPAIN	, SI_MAXPAIN	, SCB_NONE );
 	add_sc( NPC_JACKFROST		, SC_FREEZE	);
 

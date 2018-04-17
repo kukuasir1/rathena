@@ -1555,6 +1555,7 @@ int skill_additional_effect(struct block_list* src, struct block_list *bl, uint1
 		break;
 	case NPC_COMET:
 	case WL_COMET:
+	case NPC_COMET:
 		sc_start4(src,bl,SC_BURNING,100,skill_lv,1000,src->id,0,skill_get_time(skill_id,skill_lv));
 		break;
 	case WL_EARTHSTRAIN:
@@ -3393,6 +3394,7 @@ int64 skill_attack (int attack_type, struct block_list* src, struct block_list *
 		case WL_SOULEXPANSION:
 		case NPC_COMET:
 		case WL_COMET:
+		case NPC_COMET:
 		case KO_MUCHANAGE:
 		case NJ_HUUMA:
 			dmg.dmotion = clif_skill_damage(src,bl,tick,dmg.amotion,dmg.dmotion,damage,dmg.div_,skill_id,skill_lv,DMG_MULTI_HIT);
@@ -5071,6 +5073,7 @@ int skill_castend_damage_id (struct block_list* src, struct block_list *bl, uint
 		break;
 	case NPC_COMET:
 	case WL_COMET:
+	case NPC_COMET:
 		if(!map_getcell(bl->m, bl->x, bl->y, CELL_CHKLANDPROTECTOR)) // Nothing should happen if the target is on Land Protector
 			skill_attack(skill_get_type(skill_id), src, src, bl, skill_id, skill_lv, tick, flag);
 		break;
@@ -12155,6 +12158,7 @@ int skill_castend_pos2(struct block_list* src, int x, int y, uint16 skill_id, ui
 		break;
 	case NPC_COMET:
 	case WL_COMET:
+	case NPC_COMET:
 		if( sc ) {
 			sc->comet_x = x;
 			sc->comet_y = y;
