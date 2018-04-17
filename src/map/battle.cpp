@@ -6240,8 +6240,6 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
 					case SU_CN_METEOR:
 						skillratio += 100 + 100 * skill_lv;
 						break;
-					//case NPC_ICEMINE:
-					//case NPC_FLAMECROSS:
 					case NPC_VENOMFOG:
 						skillratio += 600 + 100 * skill_lv;
 						break;
