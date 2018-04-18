@@ -245,7 +245,6 @@ void initChangeTables(void)
 	set_sc( NPC_POISON		, SC_DPOISON		, SI_BLANK		, SCB_DEF2|SCB_REGEN );
 	add_sc( ALL_REVERSEORCISH,	SC_ORCISH );
 	set_sc( NPC_WIDEWEB			, SC_WIDEWEB		, SI_WIDEWEB	, SCB_FLEE);
-	set_sc( NPC_COMET			, SC_BURNING		, SI_BURNT		, SCB_MDEF);
 	set_sc_with_vfx( NPC_FIRESTORM		, SC_BURNT		, SI_BURNT		, SCB_NONE);
 
 	/* The main status definitions */
