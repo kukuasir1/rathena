@@ -1128,6 +1128,7 @@ enum npce_event : uint8 {
 	NPCE_STATCALC,
 #ifdef kuku_Event_Extend
 	NPCE_KILLMVP, // 杀死MVP魔物时的事件
+	NPCE_ITEMIDENTITY, //物品鉴定事件
 #endif
 	NPCE_MAX
 };

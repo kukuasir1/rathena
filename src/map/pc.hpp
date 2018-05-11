@@ -577,6 +577,8 @@ struct map_session_data {
 
 	int killerrid, killedrid;
 
+	int identifyidx; //鉴定物品背包索引 [kuku]
+
 	int cashPoints, kafraPoints;
 	int rental_timer;
 

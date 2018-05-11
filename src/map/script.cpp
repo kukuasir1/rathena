@@ -268,6 +268,7 @@ struct Script_Config script_config = {
 	"OnPCStatCalcEvent", //stat_calc_event_name
 #ifdef kuku_Event_Extend
 	"OnMvpKillEvent",			// kill_mvp_mob_event_name		// 杀死MVP魔物时的事件
+	"OnItemIdentityEvent", //item_identity_event_name //物品鉴定事件
 #endif
 	// NPC related
 	"OnTouch_",	//ontouch_event_name (runs on first visible char to enter area, picks another char if the first char leaves)

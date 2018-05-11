@@ -16834,6 +16834,13 @@ void skill_identify(struct map_session_data *sd, int idx)
 		}
 	}
 	clif_item_identified(sd,idx,flag);
+
+#ifdef kuku_Event_Extend
+	// 鉴定完成时的事件
+	pc_setparam(sd, SP_IDENTIFYIDX, idx);
+	npc_script_event(sd, NPCE_ITEMIDENTITY);
+#endif
+	
 }
 
 /*==========================================

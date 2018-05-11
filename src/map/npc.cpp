@@ -4489,6 +4489,8 @@ const char *npc_get_script_event_name(int npce_index)
 #ifdef kuku_Event_Extend
 	case NPCE_KILLMVP:
 		return script_config.kill_mvp_mob_event_name; // 杀死MVP魔物时的事件
+	case NPCE_ITEMIDENTITY:
+		return script_config.item_identity_event_name; //物品鉴定事件
 #endif
 	default:
 		ShowError("npc_get_script_event_name: npce_index is outside the array limits: %d (max: %d).\n", npce_index, NPCE_MAX);
