@@ -8064,7 +8064,10 @@ int pc_readparam(struct map_session_data* sd,int type)
 		case SP_ROULETTE_BRONZE: val = sd->roulette_point.bronze; break;
 		case SP_ROULETTE_SILVER: val = sd->roulette_point.silver; break;
 		case SP_ROULETTE_GOLD:   val = sd->roulette_point.gold; break;
+#ifdef kuku_Event_Extend
+		//鉴定物品背包索引getter [kuku]
 		case SP_IDENTIFYIDX:     val = sd->identifyidx; break;
+#endif
 		case SP_CRITICAL:        val = sd->battle_status.cri/10; break;
 		case SP_ASPD:            val = (2000-sd->battle_status.amotion)/10; break;
 		case SP_BASE_ATK:	     val = sd->battle_status.batk; break;
@@ -8320,8 +8323,10 @@ bool pc_setparam(struct map_session_data *sd,int type,int val)
 	case SP_KILLEDRID:
 		sd->killedrid = val;
 		return true;
-	case SP_IDENTIFYIDX: //鉴定物品背包索引 [kuku]
+#ifdef kuku_Event_Extend
+	case SP_IDENTIFYIDX: //鉴定物品背包索引setter [kuku]
 		sd->identifyidx = val;
+#endif
 	case SP_CHARMOVE:
 		sd->status.character_moves = val;
 		return true;

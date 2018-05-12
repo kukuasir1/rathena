@@ -162,7 +162,6 @@ struct Script_Config {
 #ifdef kuku_Event_Extend
 	const char* kill_mvp_mob_event_name;	// 杀死MVP魔物时的事件
 	const char* item_identity_event_name;  //物品鉴定事件
-
 #endif
 	// NPC related
 	const char* ontouch_event_name;

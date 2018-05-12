@@ -440,7 +440,9 @@ enum _sp {
 	SP_ROULETTE_BRONZE = 128,
 	SP_ROULETTE_SILVER = 129,
 	SP_ROULETTE_GOLD = 130,
+#ifdef kuku_Event_Extend
 	SP_IDENTIFYIDX = 131, // 当前鉴定物品在背包中的索引 [kuku]
+#endif
 
 	// Mercenaries
 	SP_MERCFLEE=165, SP_MERCKILLS=189, SP_MERCFAITH=190,
