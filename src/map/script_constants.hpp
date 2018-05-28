@@ -712,6 +712,7 @@
 	export_constant2("bIgnoreDefClassRate", SP_IGNORE_DEF_CLASS_RATE);
 	export_constant2("bRegenPercentHP", SP_REGEN_PERCENT_HP);
 	export_constant2("bRegenPercentSP", SP_REGEN_PERCENT_SP);
+	export_constant2("bSkillDelay",SP_SKILL_DELAY);
 
 	/* equip indices */
 	export_constant(EQI_COMPOUND_ON);
@@ -3927,6 +3928,8 @@
 	export_constant(PETINFO_RENAMED);
 	export_constant(PETINFO_LEVEL);
 	export_constant(PETINFO_BLOCKID);
+	export_constant(PETINFO_EGGID);
+	export_constant(PETINFO_FOODID);
 
 	// For backwards compatability - might be removed in the near future
 	export_constant2("PET_ID",PETINFO_ID);
@@ -4339,6 +4342,7 @@
 	export_constant(ROA_VALUE);
 	export_constant(ROA_PARAM);
 
+	/* special card flags */
 	export_constant(CARD0_FORGE);
 	export_constant(CARD0_CREATE);
 	export_constant(CARD0_PET);
@@ -4965,6 +4969,8 @@
 	export_constant(REFINE_COST_HD);
 	export_constant(REFINE_COST_ENRICHED);
 	export_constant(REFINE_COST_OVER10_HD);
+	export_constant(REFINE_COST_HOLINK);
+	export_constant(REFINE_COST_WAGJAK);
 	export_constant(REFINE_COST_MAX);
 
 	/* refine information types */
