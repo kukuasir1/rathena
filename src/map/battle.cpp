@@ -6023,7 +6023,6 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
 						skillratio += 100 + 100 * skill_lv;
 						RE_LVL_DMOD(100);
 						break;
-					case NPC_JACKFROST:
 					case WL_JACKFROST:
 					case NPC_JACKFROST:
 						if (tsc && tsc->data[SC_FREEZING]) {
