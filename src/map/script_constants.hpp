@@ -514,10 +514,13 @@
 	export_parameter(ROULETTE_BRONZE_VAR,SP_ROULETTE_BRONZE);
 	export_parameter(ROULETTE_SILVER_VAR,SP_ROULETTE_SILVER);
 	export_parameter(ROULETTE_GOLD_VAR,SP_ROULETTE_GOLD);
+	export_parameter(CASHPOINT_VAR, SP_CASHPOINTS);
+	export_parameter(KAFRAPOINT_VAR, SP_KAFRAPOINTS);
+	export_parameter(PCDIECOUNTER_VAR, SP_PCDIECOUNTER);
+	export_parameter(COOKMASTERY_VAR, SP_COOKMASTERY);
 #ifdef kuku_Event_Extend
 	export_parameter("identifyidx",SP_IDENTIFYIDX); //鉴定物品在背包中的索引 [kuku]
 #endif
-
 	export_constant2("bMaxHP",SP_MAXHP);
 	export_constant2("bMaxSP",SP_MAXSP);
 	export_constant2("bStr",SP_STR);
