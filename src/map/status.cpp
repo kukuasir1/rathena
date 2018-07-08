@@ -7783,17 +7783,14 @@ void status_set_viewdata(struct block_list *bl, int class_)
 						sd->vd.cloth_color = 0;
 					if(sd->sc.option&OPTION_XMAS && battle_config.xmas_ignorepalette)
 						sd->vd.cloth_color = 0;
-					if(sd->sc.option&OPTION_SUMMER && battle_config.summer_ignorepalette)
+					if(sd->sc.option&(OPTION_SUMMER|OPTION_SUMMER2) && battle_config.summer_ignorepalette)
 						sd->vd.cloth_color = 0;
 					if(sd->sc.option&OPTION_HANBOK && battle_config.hanbok_ignorepalette)
 						sd->vd.cloth_color = 0;
 					if(sd->sc.option&OPTION_OKTOBERFEST && battle_config.oktoberfest_ignorepalette)
 						sd->vd.cloth_color = 0;
 				}
-				if ( sd->vd.body_style && (
- 					sd->sc.option&OPTION_WEDDING || sd->sc.option&OPTION_XMAS ||
- 					sd->sc.option&OPTION_SUMMER || sd->sc.option&OPTION_HANBOK ||
- 					sd->sc.option&OPTION_OKTOBERFEST))
+				if ( sd->vd.body_style && sd->sc.option&OPTION_COSTUME)
  					sd->vd.body_style = 0;
 			} else if (vd)
 				memcpy(&sd->vd, vd, sizeof(struct view_data));
@@ -8932,6 +8929,12 @@ int status_change_start(struct block_list* src, struct block_list* bl,enum sc_ty
 			case SC_OBLIVIONCURSE:
 			case SC_LEECHESEND:
 			case SC_BANDING_DEFENCE:
+			case SC__ENERVATION:
+			case SC__GROOMY:
+			case SC__IGNORANCE:
+			case SC__LAZINESS:
+			case SC__UNLUCKY:
+			case SC__WEAKNESS:
 			case SC_BITE:
 			case SC_ELECTRICSHOCKER:
 			case SC_MAGNETICFIELD:
@@ -11557,7 +11560,6 @@ int status_change_start(struct block_list* src, struct block_list* bl,enum sc_ty
 			opt_flag |= 0x4;
 			break;
 		case SC_SUMMER:
-		case SC_DRESSUP:
 			sc->option |= OPTION_SUMMER;
 			opt_flag |= 0x4;
 			break;
@@ -11567,6 +11569,10 @@ int status_change_start(struct block_list* src, struct block_list* bl,enum sc_ty
 			break;
 		case SC_OKTOBERFEST:
 			sc->option |= OPTION_OKTOBERFEST;
+			opt_flag |= 0x4;
+			break;
+		case SC_DRESSUP:
+			sc->option |= OPTION_SUMMER2;
 			opt_flag |= 0x4;
 			break;
 		case SC_ORCISH:
@@ -12553,7 +12559,6 @@ int status_change_end_(struct block_list* bl, enum sc_type type, int tid, const 
 		opt_flag |= 0x4;
 		break;
 	case SC_SUMMER:
-	case SC_DRESSUP:
 		sc->option &= ~OPTION_SUMMER;
 		opt_flag |= 0x4;
 		break;
@@ -12563,6 +12568,10 @@ int status_change_end_(struct block_list* bl, enum sc_type type, int tid, const 
 		break;
 	case SC_OKTOBERFEST:
 		sc->option &= ~OPTION_OKTOBERFEST;
+		opt_flag |= 0x4;
+		break;
+	case SC_DRESSUP:
+		sc->option &= ~OPTION_SUMMER2;
 		opt_flag |= 0x4;
 		break;
 	case SC_ORCISH:
