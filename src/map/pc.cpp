@@ -8372,6 +8372,8 @@ bool pc_setparam(struct map_session_data *sd,int type,int val)
 #ifdef kuku_Event_Extend
 	case SP_IDENTIFYIDX: //鉴定物品背包索引setter [kuku]
 		sd->identifyidx = val;
+		pc_setreg2(sd, "@identifyidx", sd->identifyidx);
+		return true;
 #endif
 	case SP_CHARMOVE:
 		sd->status.character_moves = val;
