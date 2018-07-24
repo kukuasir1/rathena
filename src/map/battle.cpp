@@ -2166,7 +2166,6 @@ static int battle_blewcount_bonus(struct map_session_data *sd, uint16 skill_id)
 	return 0;
 }
 
-#ifdef ADJUST_SKILL_DAMAGE
 static enum e_skill_damage_type battle_skill_damage_type( struct block_list* bl ){
 	switch( bl->type ){
 		case BL_PC:
@@ -2202,11 +2201,14 @@ static int battle_skill_damage_skill(struct block_list *src, struct block_list *
 	if (!(damage->caster&src->type))
 		return 0;
 
-	if ((damage->map&1 && (!map_getmapflag(m, MF_PVP) && !map_flag_gvg2(m) && !map_getmapflag(m, MF_BATTLEGROUND) && !map_getmapflag(m, MF_SKILL_DAMAGE) && !map_getmapflag(m, MF_RESTRICTED))) ||
+	union u_mapflag_args args = {};
+
+	args.flag_val = SKILLDMG_MAX; // Check if it's enabled first
+	if ((damage->map&1 && (!map_getmapflag(m, MF_PVP) && !map_flag_gvg2(m) && !map_getmapflag(m, MF_BATTLEGROUND) && !map_getmapflag_sub(m, MF_SKILL_DAMAGE, &args) && !map_getmapflag(m, MF_RESTRICTED))) ||
 		(damage->map&2 && map_getmapflag(m, MF_PVP)) ||
 		(damage->map&4 && map_flag_gvg2(m)) ||
 		(damage->map&8 && map_getmapflag(m, MF_BATTLEGROUND)) ||
-		(damage->map&16 && map_getmapflag(m, MF_SKILL_DAMAGE)) ||
+		(damage->map&16 && map_getmapflag_sub(m, MF_SKILL_DAMAGE, &args)) ||
 		(map_getmapflag(m, MF_RESTRICTED) && damage->map&(8*map[m].zone)))
 	{
 		return damage->rate[battle_skill_damage_type(target)];
@@ -2225,8 +2227,10 @@ static int battle_skill_damage_skill(struct block_list *src, struct block_list *
 static int battle_skill_damage_map(struct block_list *src, struct block_list *target, uint16 skill_id) {
 	int rate = 0;
 	struct map_data *mapd = &map[src->m];
+	union u_mapflag_args args = {};
 
-	if (!mapd || !map_getmapflag(src->m, MF_SKILL_DAMAGE))
+	args.flag_val = SKILLDMG_MAX; // Check if it's enabled first
+	if (!mapd || !map_getmapflag_sub(src->m, MF_SKILL_DAMAGE, &args))
 		return 0;
 
 	// Damage rate for all skills at this map
@@ -2258,7 +2262,6 @@ static int battle_skill_damage(struct block_list *src, struct block_list *target
 	skill_id = skill_dummy2skill_id(skill_id);
 	return battle_skill_damage_skill(src, target, skill_id) + battle_skill_damage_map(src, target, skill_id);
 }
-#endif
 
 /**
  * Calculates Minstrel/Wanderer bonus for Chorus skills.
@@ -5113,9 +5116,7 @@ struct Damage battle_calc_weapon_final_atk_modifiers(struct Damage wd, struct bl
 	struct status_change *tsc = status_get_sc(target);
 	struct status_data *sstatus = status_get_status_data(src);
 	struct status_data *tstatus = status_get_status_data(target);
-#ifdef ADJUST_SKILL_DAMAGE
 	int skill_damage = 0;
-#endif
 
 	//Reject Sword bugreport:4493 by Daegaladh
 	if(wd.damage && tsc && tsc->data[SC_REJECTSWORD] &&
@@ -5197,10 +5198,8 @@ struct Damage battle_calc_weapon_final_atk_modifiers(struct Damage wd, struct bl
 	}
 
 	// Skill damage adjustment
-#ifdef ADJUST_SKILL_DAMAGE
 	if ((skill_damage = battle_skill_damage(src, target, skill_id)) != 0)
 		ATK_ADDRATE(wd.damage, wd.damage2, skill_damage);
-#endif
 	return wd;
 }
 
@@ -5689,10 +5688,7 @@ static struct Damage battle_calc_weapon_attack(struct block_list *src, struct bl
  */
 struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list *target,uint16 skill_id,uint16 skill_lv,int mflag)
 {
-	int i, nk;
-#ifdef ADJUST_SKILL_DAMAGE
-	int skill_damage = 0;
-#endif
+	int i, nk, skill_damage = 0;
 	short s_ele = 0;
 
 	TBL_PC *sd;
@@ -6419,10 +6415,8 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
 		ad.damage = battle_calc_bg_damage(src,target,ad.damage,skill_id,ad.flag);
 
 	// Skill damage adjustment
-#ifdef ADJUST_SKILL_DAMAGE
 	if ((skill_damage = battle_skill_damage(src,target,skill_id)) != 0)
 		MATK_ADDRATE(skill_damage);
-#endif
 
 	battle_absorb_damage(target, &ad);
 
@@ -6439,9 +6433,7 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
  */
 struct Damage battle_calc_misc_attack(struct block_list *src,struct block_list *target,uint16 skill_id,uint16 skill_lv,int mflag)
 {
-#ifdef ADJUST_SKILL_DAMAGE
 	int skill_damage = 0;
-#endif
 	short i, nk;
 	short s_ele;
 
@@ -6818,10 +6810,8 @@ struct Damage battle_calc_misc_attack(struct block_list *src,struct block_list *
 		md.damage = battle_calc_bg_damage(src,target,md.damage,skill_id,md.flag);
 
 	// Skill damage adjustment
-#ifdef ADJUST_SKILL_DAMAGE
 	if ((skill_damage = battle_skill_damage(src,target,skill_id)) != 0)
 		md.damage += (int64)md.damage * skill_damage / 100;
-#endif
 
 	battle_absorb_damage(target, &md);
 
