@@ -494,16 +494,18 @@ static void script_reportsrc(struct script_state *st)
 	if( bl == NULL )
 		return;
 
+	struct map_data *mapdata = map_getmapdata(bl->m);
+
 	switch( bl->type ) {
 		case BL_NPC:
 			if( bl->m >= 0 )
-				ShowDebug("Source (NPC): %s at %s (%d,%d)\n", ((struct npc_data *)bl)->name, map[bl->m].name, bl->x, bl->y);
+				ShowDebug("Source (NPC): %s at %s (%d,%d)\n", ((struct npc_data *)bl)->name, mapdata->name, bl->x, bl->y);
 			else
 				ShowDebug("Source (NPC): %s (invisible/not on a map)\n", ((struct npc_data *)bl)->name);
 			break;
 		default:
 			if( bl->m >= 0 )
-				ShowDebug("Source (Non-NPC type %d): name %s at %s (%d,%d)\n", bl->type, status_get_name(bl), map[bl->m].name, bl->x, bl->y);
+				ShowDebug("Source (Non-NPC type %d): name %s at %s (%d,%d)\n", bl->type, status_get_name(bl), mapdata->name, bl->x, bl->y);
 			else
 				ShowDebug("Source (Non-NPC type %d): name %s (invisible/not on a map)\n", bl->type, status_get_name(bl));
 			break;
@@ -5608,7 +5610,7 @@ BUILDIN_FUNC(warpparty)
 		if( !(pl_sd = p->data[i].sd) || pl_sd->status.party_id != p_id )
 			continue;
 
-		if( str2 && strcmp(str2, map[pl_sd->bl.m].name) != 0 )
+		if( str2 && strcmp(str2, map_getmapdata(pl_sd->bl.m)->name) != 0 )
 			continue;
 
 		if( pc_isdead(pl_sd) )
@@ -8441,7 +8443,7 @@ BUILDIN_FUNC(strcharinfo)
 			}
 			break;
 		case 3:
-			script_pushconststr(st,map[sd->bl.m].name);
+			script_pushconststr(st,map_getmapdata(sd->bl.m)->name);
 			break;
 		default:
 			ShowWarning("buildin_strcharinfo: unknown parameter.\n");
@@ -8495,7 +8497,7 @@ BUILDIN_FUNC(strnpcinfo)
 			break;
 		case 4: // map name
 			if (nd->bl.m >= 0)
-				name = aStrdup(map[nd->bl.m].name);
+				name = aStrdup(map_getmapdata(nd->bl.m)->name);
 			break;
 	}
 
@@ -10974,7 +10976,7 @@ BUILDIN_FUNC(getusers)
 
 			if(bl)
 			{
-				val = map[bl->m].users;
+				val = map_getmapdata(bl->m)->users;
 			}
 			break;
 		case 1:
@@ -11032,7 +11034,7 @@ BUILDIN_FUNC(getmapusers)
 		script_pushint(st,-1);
 		return SCRIPT_CMD_SUCCESS;
 	}
-	script_pushint(st,map[m].users);
+	script_pushint(st,map_getmapdata(m)->users);
 	return SCRIPT_CMD_SUCCESS;
 }
 /*==========================================
@@ -14942,7 +14944,7 @@ BUILDIN_FUNC(getmapxy)
 
 	x= bl->x;
 	y= bl->y;
-	safestrncpy(mapname, map[bl->m].name, MAP_NAME_LENGTH);
+	safestrncpy(mapname, map_getmapdata(bl->m)->name, MAP_NAME_LENGTH);
 
 	//Set MapName$
 	num=st->stack->stack_data[st->start+2].u.num;
@@ -14998,7 +15000,7 @@ BUILDIN_FUNC(mapid2name)
 {
 	uint16 m = script_getnum(st, 2);
 
-	if (m < 0 || m >= MAX_MAP_PER_SERVER) {
+	if (m < 0) {
 		script_pushconststr(st, "");
 		return SCRIPT_CMD_FAILURE;
 	}
@@ -19517,8 +19519,10 @@ BUILDIN_FUNC(bg_updatescore)
 	if( (m = map_mapname2mapid(str)) < 0 )
 		return SCRIPT_CMD_SUCCESS;
 
-	map[m].bgscore_lion = script_getnum(st,3);
-	map[m].bgscore_eagle = script_getnum(st,4);
+	struct map_data *mapdata = map_getmapdata(m);
+
+	mapdata->bgscore_lion = script_getnum(st,3);
+	mapdata->bgscore_eagle = script_getnum(st,4);
 
 	clif_bg_updatescore(m);
 	return SCRIPT_CMD_SUCCESS;
@@ -19654,7 +19658,7 @@ BUILDIN_FUNC(instance_destroy)
 	else
 		instance_id = script_instancegetid(st);
 
-	if( instance_id == 0 || instance_id >= MAX_MAP_PER_SERVER ) {
+	if( instance_id == 0 ) {
 		ShowError("buildin_instance_destroy: Trying to destroy invalid instance %hu.\n", instance_id);
 		return SCRIPT_CMD_FAILURE;
 	}
@@ -19744,7 +19748,7 @@ BUILDIN_FUNC(instance_mapname)
 	if(!instance_id || (m = instance_mapname2mapid(str,instance_id)) < 0)
 		script_pushconststr(st, "");
 	else
-		script_pushconststr(st, map[m].name);
+		script_pushconststr(st, map_getmapdata(m)->name);
 
 	return SCRIPT_CMD_SUCCESS;
 }
@@ -19818,7 +19822,7 @@ BUILDIN_FUNC(instance_warpall)
 	else
 		instance_id = script_instancegetid(st);
 
-	if( !instance_id || (m = map_mapname2mapid(mapn)) < 0 || (m = instance_mapname2mapid(map[m].name,instance_id)) < 0)
+	if( !instance_id || (m = map_mapname2mapid(mapn)) < 0 || (m = instance_mapname2mapid(map_getmapdata(m)->name,instance_id)) < 0)
 		return SCRIPT_CMD_FAILURE;
 
 	for(i = 0; i < instance_data[instance_id].cnt_map; i++)
@@ -22976,7 +22980,7 @@ BUILDIN_FUNC(channel_chat) {
 			script_pushint(st,0);
 			return SCRIPT_CMD_FAILURE;
 		}
-		if (!(ch = map[m].channel)) {
+		if (!(ch = map_getmapdata(m)->channel)) {
 			ShowDebug("buildin_channel_chat: Map '%s' doesn't have local channel yet.\n", chname);
 			script_pushint(st,0);
 			return SCRIPT_CMD_SUCCESS;
@@ -22989,7 +22993,7 @@ BUILDIN_FUNC(channel_chat) {
 			script_pushint(st,0);
 			return SCRIPT_CMD_FAILURE;
 		}
-		if (!(ch = map[nd->bl.m].channel)) {
+		if (!(ch = map_getmapdata(nd->bl.m)->channel)) {
 			ShowDebug("buildin_channel_chat: Map '%s' doesn't have local channel yet.\n", chname);
 			script_pushint(st,0);
 			return SCRIPT_CMD_SUCCESS;
