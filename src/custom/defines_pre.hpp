@@ -1,8 +1,8 @@
 // Copyright (c) rAthena Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
-#ifndef _CONFIG_CUSTOM_DEFINES_PRE_HPP_
-#define _CONFIG_CUSTOM_DEFINES_PRE_HPP_
+#ifndef CONFIG_CUSTOM_DEFINES_PRE_HPP
+#define CONFIG_CUSTOM_DEFINES_PRE_HPP
 
 /**
  * rAthena configuration file (http://rathena.org)
@@ -19,4 +19,4 @@
 #define PACKET_OBFUSCATION_KEY3 0x10823ff3
 */
 
-#endif // _CONFIG_CUSTOM_DEFINES_PRE_HPP_
+#endif /* CONFIG_CUSTOM_DEFINES_PRE_HPP */

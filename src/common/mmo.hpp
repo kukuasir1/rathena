@@ -1,8 +1,8 @@
 // Copyright (c) rAthena Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
-#ifndef	_MMO_HPP_
-#define	_MMO_HPP_
+#ifndef MMO_HPP
+#define MMO_HPP
 
 #include <time.h>
 
@@ -32,9 +32,10 @@
 	#define MAX_HOTKEYS 38
 #endif
 
+#define MAX_MAP_PER_SERVER 1500 /// Maximum amount of maps available on a server
+
 // 是否扩展事件
-#define kuku_Event_Extend
-#define MAX_INVENTORY 100 ///Maximum items in player inventory
+#define kuku_Event_Extend#define MAX_INVENTORY 100 ///Maximum items in player inventory
 /** Max number of characters per account. Note that changing this setting alone is not enough if the client is not hexed to support more characters as well.
 * Max value tested was 265 */
 #ifndef MAX_CHARS
@@ -1050,4 +1051,4 @@ struct clan{
 	#define MAX_CARTS 5
 #endif
 
-#endif /* _MMO_HPP_ */
+#endif /* MMO_HPP */
