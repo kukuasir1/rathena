@@ -35,7 +35,8 @@
 #define MAX_MAP_PER_SERVER 1500 /// Maximum amount of maps available on a server
 
 // 是否扩展事件
-#define kuku_Event_Extend#define MAX_INVENTORY 100 ///Maximum items in player inventory
+#define kuku_Event_Extend
+#define MAX_INVENTORY 100 ///Maximum items in player inventory
 /** Max number of characters per account. Note that changing this setting alone is not enough if the client is not hexed to support more characters as well.
 * Max value tested was 265 */
 #ifndef MAX_CHARS
