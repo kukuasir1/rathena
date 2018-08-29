@@ -2760,10 +2760,7 @@ int map_delinstancemap(int m)
 	aFree(mapdata->block);
 	aFree(mapdata->block_mob);
 	map_free_questinfo(m);
-	mapdata->flag.clear();
-	mapdata->drop_list.clear();
 	mapdata->damage_adjust = {};
-	mapdata->skill_damage.clear();
 
 	mapindex_removemap( mapdata->index );
 	map_removemapdb(mapdata);
@@ -3780,7 +3777,7 @@ int map_readallmaps (void)
 		ShowNotice("Maps removed: '" CL_WHITE "%d" CL_RESET "'" CL_CLL ".\n", maps_removed);
 
 	// finished map loading
-	ShowInfo("Successfully loaded '" CL_WHITE "%d" CL_RESET "' maps.\n",map_num);
+	ShowInfo("Successfully loaded '" CL_WHITE "%d" CL_RESET "' maps." CL_CLL "\n",map_num);
 
 	return 0;
 }
