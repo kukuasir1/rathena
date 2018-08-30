@@ -22745,7 +22745,6 @@ BUILDIN_FUNC(openstorage2) {
 }
 
 /**
-
  * Create a new channel
  * channel_create "<chname>","<alias>"{,"<password>"{<option>{,<delay>{,<color>{,<char_id>}}}}};
  * @author [Cydh]

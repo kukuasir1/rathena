@@ -2376,7 +2376,7 @@ int status_base_amotion_pc(struct map_session_data* sd, struct status_data* stat
 	float temp_aspd = 0;
 
 	amotion = job_info[classidx].aspd_base[sd->weapontype1]; // Single weapon
-	if ( sd->status.shield )
+	if (sd->status.shield)
 		amotion += job_info[classidx].aspd_base[MAX_WEAPON_TYPE];
 	else if (sd->weapontype2 && sd->equip_index[EQI_HAND_R] != sd->equip_index[EQI_HAND_L])
 		amotion += job_info[classidx].aspd_base[sd->weapontype2] / 4; // Dual-wield
@@ -2409,14 +2409,14 @@ int status_base_amotion_pc(struct map_session_data* sd, struct status_data* stat
 
 	// Base weapon delay
 	amotion = (sd->status.weapon < MAX_WEAPON_TYPE)
-	 ? (job_info[classidx].aspd_base[sd->status.weapon]) // Single weapon
-	 : (job_info[classidx].aspd_base[sd->weapontype1] + job_info[classidx].aspd_base[sd->weapontype2])*7/10; // Dual-wield
+		? (job_info[classidx].aspd_base[sd->status.weapon]) // Single weapon
+		: (job_info[classidx].aspd_base[sd->weapontype1] + job_info[classidx].aspd_base[sd->weapontype2]) * 7 / 10; // Dual-wield
 
 	// Percentual delay reduction from stats
-	amotion -= amotion * (4*status->agi + status->dex)/1000;
+	amotion -= amotion * (4 * status->agi + status->dex) / 1000;
 
 	// Raw delay adjustment from bAspd bonus
-		amotion += sd->bonus.aspd_add;
+	amotion += sd->bonus.aspd_add;
 #endif
 
  	return amotion;
@@ -5187,7 +5187,7 @@ void status_calc_bl_main(struct block_list *bl, /*enum scb_flag*/int flag)
 			amotion = (1000 - 4 * status->agi - status->dex) * ((TBL_HOM*)bl)->homunculusDB->baseASPD / 1000;
 
 			amotion = status_calc_aspd_rate(bl, sc, amotion);
-				amotion = amotion * status->aspd_rate / 1000;
+			amotion = amotion * status->aspd_rate / 1000;
 #endif
 
 			amotion = status_calc_fix_aspd(bl, sc, amotion);
@@ -5202,7 +5202,7 @@ void status_calc_bl_main(struct block_list *bl, /*enum scb_flag*/int flag)
 			status->aspd_rate = status_calc_aspd_rate(bl, sc, b_status->aspd_rate);
 #endif
 			// Absolute ASPD % modifier
-				amotion = amotion*status->aspd_rate/1000;
+			amotion = amotion * status->aspd_rate / 1000;
 			if (sd->ud.skilltimer != INVALID_TIMER && (skill_lv = pc_checkskill(sd, SA_FREECAST)) > 0)
 				amotion = amotion * 5 * (skill_lv + 10) / 100;
 #ifdef RENEWAL_ASPD
@@ -5215,11 +5215,11 @@ void status_calc_bl_main(struct block_list *bl, /*enum scb_flag*/int flag)
 			amotion = status_calc_fix_aspd(bl, sc, amotion);
 			status->amotion = cap_value(amotion,pc_maxaspd(sd),2000);
 
-			status->adelay = 2*status->amotion;
+			status->adelay = 2 * status->amotion;
 		} else { // Mercenary and mobs
 			amotion = b_status->amotion;
 			status->aspd_rate = status_calc_aspd_rate(bl, sc, b_status->aspd_rate);
-				amotion = amotion*status->aspd_rate/1000;
+			amotion = amotion*status->aspd_rate/1000;
 
 			amotion = status_calc_fix_aspd(bl, sc, amotion);
 			status->amotion = cap_value(amotion, battle_config.monster_max_aspd, 2000);
@@ -14691,7 +14691,7 @@ int status_readdb(void)
 			safesnprintf(dbsubpath1,n1,"%s%s",db_path,dbsubpath[i]);
 			safesnprintf(dbsubpath2,n1,"%s%s",db_path,dbsubpath[i]);
 		}
-		
+
 		status_readdb_attrfix(dbsubpath2,i > 0); // !TODO use sv_readdb ?
 		sv_readdb(dbsubpath1, "status_disabled.txt", ',', 2, 2, -1, &status_readdb_status_disabled, i > 0);
 		sv_readdb(dbsubpath1, "size_fix.txt",',',MAX_WEAPON_TYPE,MAX_WEAPON_TYPE,ARRAYLENGTH(atkmods),&status_readdb_sizefix, i > 0);
