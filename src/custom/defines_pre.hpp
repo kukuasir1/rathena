@@ -10,7 +10,7 @@
  **/
  //客户端登陆器版本
 //#define PACKETVER 20180124
-#define PACKETVER 20180321
+#define PACKETVER 20180621
 
  //封包加密的3个秘钥
 /*
