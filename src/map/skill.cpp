@@ -6772,7 +6772,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 	case ST_PRESERVE:
 	case NPC_INVINCIBLE:
 	case NPC_INVINCIBLEOFF:
-	case MER_INVINCIBLEOFF2:
+	//case MER_INVINCIBLEOFF2:
 	case RK_DEATHBOUND:
 	case AB_EXPIATIO:
 	case AB_DUPLELIGHT:
