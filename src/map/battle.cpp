@@ -5851,6 +5851,9 @@ struct Damage battle_calc_magic_attack(struct block_list *src,struct block_list 
 			case PF_SOULBURN:
 				ad.damage = tstatus->sp * 2;
 				break;
+			case AB_RENOVATIO:
+				ad.damage = status_get_lv(src) * 10 + sstatus->int_;
+				break;
 			case NPC_ICEMINE:
 			case NPC_FLAMECROSS:
 				ad.damage = sstatus->rhw.atk * 20 * skill_lv;

@@ -6772,6 +6772,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 	case ST_PRESERVE:
 	case NPC_INVINCIBLE:
 	case NPC_INVINCIBLEOFF:
+	case MER_INVINCIBLEOFF2:
 	case RK_DEATHBOUND:
 	case AB_EXPIATIO:
 	case AB_DUPLELIGHT:
@@ -13794,9 +13795,9 @@ int skill_unit_onplace_timer(struct skill_unit *unit, struct block_list *bl, uns
 		case UNT_MAGMA_ERUPTION:
 		case UNT_MAKIBISHI:
 		case UNT_VENOMFOG:
-		case UNT_HELLBURNING:
-		case UNT_FLAMECROSS:
 		case UNT_ICEMINE:
+		case UNT_FLAMECROSS:
+		case UNT_HELLBURNING:
 			skill_attack(skill_get_type(sg->skill_id),ss,&unit->bl,bl,sg->skill_id,sg->skill_lv,tick,0);
 			break;
 
@@ -20604,12 +20605,12 @@ void skill_init_unit_layout (void) {
 					}
 					break;
 				case NPC_FLAMECROSS: {
-						static const int dx[] = { -2, -1, 1, 2, 0, 0, 0, 0 };
-						static const int dy[] = { 0, 0, 0, 0, -2, -1, 1, 2 };
+						static const int dx[] = {-2,-1, 1, 2, 0, 0, 0, 0};
+						static const int dy[] = { 0, 0, 0, 0,-2,-1, 1, 2};
 
 						skill_unit_layout[pos].count = 8;
-						memcpy(skill_unit_layout[pos].dx, dx, sizeof(dx));
-						memcpy(skill_unit_layout[pos].dy, dy, sizeof(dy));
+						memcpy(skill_unit_layout[pos].dx,dx,sizeof(dx));
+						memcpy(skill_unit_layout[pos].dy,dy,sizeof(dy));
 					}
 					break;
 				default:
