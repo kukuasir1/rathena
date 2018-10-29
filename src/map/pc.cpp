@@ -7672,8 +7672,20 @@ void pc_damage(struct map_session_data *sd,struct block_list *src,unsigned int h
 		skill_sit(sd,0);
 	}
 
-	if (sd->progressbar.npc_id)
+	if (sd->progressbar.npc_id) {
 		clif_progressbar_abort(sd);
+
+		// 如果没有对话框, 则执行end; 否则添加close按钮 [kuku]
+		if (!sd->st->mes_active) {
+			sd->st->state = END;
+		}
+		else {
+			sd->st->state = CLOSE;
+			sd->st->mes_active = 0;
+		}
+		clif_scriptclose(sd, sd->st->oid);
+	}
+		
 
 	if( sd->status.pet_id > 0 && sd->pd && battle_config.pet_damage_support )
 		pet_target_check(sd->pd,src,1);
