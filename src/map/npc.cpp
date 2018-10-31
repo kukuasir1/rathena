@@ -855,7 +855,7 @@ int npc_settimerevent_tick(struct npc_data* nd, int newtimer)
 
 int npc_event_sub(struct map_session_data* sd, struct event_data* ev, const char* eventname)
 {
-	if ( sd->npc_id != 0 && !running_npc_stat_calc_event ) //OnPCStatCalcEvent事件执行时跳过 [kuku]
+	if ( sd->npc_id != 0 )
 	{
 		//Enqueue the event trigger.
 		int i;
