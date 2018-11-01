@@ -403,7 +403,7 @@ int npc_event_doall_sub(DBKey key, DBData *data, va_list ap)
 	p = strchr(p, ':'); // match only the event name
 	if( p && strcmpi(name, p) == 0 /* && !ev->nd->src_id */ ) // Do not run on duplicates. [Paradox924X]
 	{
-		if(rid) // a player may only have 1 script running at the same time
+		if(rid && !strstr(p, "OnPCStatCalcEvent2")) // a player may only have 1 script running at the same time
 			npc_event_sub(map_id2sd(rid),ev,key.str);
 		else
 			run_script(ev->nd->u.scr.script,ev->pos,rid,ev->nd->bl.id);

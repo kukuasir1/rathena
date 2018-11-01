@@ -3572,6 +3572,10 @@ int status_calc_pc_sub(struct map_session_data* sd, enum e_status_calc_opt opt)
 
 	pc_itemgrouphealrate_clear(sd);
 
+	//额外执行OnPCStatCalcEvent2事件 [kuku]
+	if (sd)
+		npc_event_doall_id("OnPCStatCalcEvent2", sd->bl.id);
+
 	running_npc_stat_calc_event = true;
 	npc_script_event(sd, NPCE_STATCALC);
 	running_npc_stat_calc_event = false;
