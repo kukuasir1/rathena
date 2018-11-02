@@ -7682,8 +7682,8 @@ void pc_damage(struct map_session_data *sd,struct block_list *src,unsigned int h
 		else {
 			sd->st->state = CLOSE;
 			sd->st->mes_active = 0;
+			clif_scriptclose(sd, sd->st->oid);
 		}
-		clif_scriptclose(sd, sd->st->oid);
 		clif_cutin(sd,"",255);
 	}
 		

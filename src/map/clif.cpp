@@ -10823,8 +10823,8 @@ void clif_parse_WalkToXY(int fd, struct map_session_data *sd)
 		else {
 			sd->st->state = CLOSE;
 			sd->st->mes_active = 0;
+			clif_scriptclose(sd, sd->st->oid);
 		}
-		clif_scriptclose(sd, sd->st->oid);
 		clif_cutin(sd, "", 255);
 		return; // First walk attempt cancels the progress bar
 	} else if (pc_cant_act(sd))
