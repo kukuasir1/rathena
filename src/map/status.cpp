@@ -3453,7 +3453,6 @@ int status_calc_pc_sub(struct map_session_data* sd, enum e_status_calc_opt opt)
 		+ sizeof(sd->subclass)
 		+ sizeof(sd->subrace2)
 		+ sizeof(sd->subsize)
-		+ sizeof(sd->reseff)
 		+ sizeof(sd->coma_class)
 		+ sizeof(sd->coma_race)
 		+ sizeof(sd->weapon_coma_ele)
@@ -3524,53 +3523,52 @@ int status_calc_pc_sub(struct map_session_data* sd, enum e_status_calc_opt opt)
 	base_status->race = ((battle_config.summoner_trait&1) && (sd->class_&MAPID_BASEMASK) == MAPID_SUMMONER) ? RC_BRUTE : RC_PLAYER;
 	base_status->class_ = CLASS_NORMAL;
 
+	sd->autospell.clear();
+	sd->autospell2.clear();
+	sd->autospell3.clear();
+	sd->addeff.clear();
+	sd->addeff_atked.clear();
+	sd->addeff_onskill.clear();
+	sd->skillatk.clear();
+	sd->skillusesprate.clear();
+	sd->skillusesp.clear();
+	sd->skillheal.clear();
+	sd->skillheal2.clear();
+	sd->skillblown.clear();
+	sd->skillcastrate.clear();
+	sd->skillfixcastrate.clear();
+	sd->subskill.clear();
+	sd->skillcooldown.clear();
+	sd->skillfixcast.clear();
+	sd->skillvarcast.clear();
+	sd->add_def.clear();
+	sd->add_mdef.clear();
+	sd->add_mdmg.clear();
+	sd->reseff.clear();
+	sd->itemgrouphealrate.clear();
+	sd->add_drop.clear();
+	sd->itemhealrate.clear();
+	sd->subele2.clear();
+	sd->skilldelay.clear();
+
 	// Zero up structures...
-	memset(&sd->autospell, 0, sizeof(sd->autospell)
-		+ sizeof(sd->autospell2)
-		+ sizeof(sd->autospell3)
-		+ sizeof(sd->addeff)
-		+ sizeof(sd->addeff_atked)
-		+ sizeof(sd->addeff_onskill)
-		+ sizeof(sd->skillatk)
-		+ sizeof(sd->skillusesprate)
-		+ sizeof(sd->skillusesp)
-		+ sizeof(sd->skillheal)
-		+ sizeof(sd->skillheal2)
-		+ sizeof(sd->skillblown)
-		+ sizeof(sd->skillcastrate)
-		+ sizeof(sd->skillfixcastrate)
-		+ sizeof(sd->subskill)
-		+ sizeof(sd->skillcooldown)
-		+ sizeof(sd->skillfixcast)
-		+ sizeof(sd->skillvarcast)
-		+ sizeof(sd->hp_loss)
-		+ sizeof(sd->sp_loss)
+	memset(&sd->hp_loss, 0, sizeof(sd->sp_loss)
 		+ sizeof(sd->hp_regen)
 		+ sizeof(sd->sp_regen)
 		+ sizeof(sd->percent_hp_regen)
 		+ sizeof(sd->percent_sp_regen)
-		+ sizeof(sd->add_def)
-		+ sizeof(sd->add_mdef)
-		+ sizeof(sd->add_mdmg)
-		+ sizeof(sd->add_drop)
-		+ sizeof(sd->itemhealrate)
-		+ sizeof(sd->subele2)
 		+ sizeof(sd->def_set_race)
 		+ sizeof(sd->mdef_set_race)
 		+ sizeof(sd->norecover_state_race)
 		+ sizeof(sd->hp_vanish_race)
 		+ sizeof(sd->sp_vanish_race)
-		+ sizeof(sd->skilldelay)
+		+ sizeof(sd->bonus)
 	);
 
-	memset (&sd->bonus, 0, sizeof(sd->bonus));
-
 	// Autobonus
-	pc_delautobonus(sd,sd->autobonus,ARRAYLENGTH(sd->autobonus),true);
-	pc_delautobonus(sd,sd->autobonus2,ARRAYLENGTH(sd->autobonus2),true);
-	pc_delautobonus(sd,sd->autobonus3,ARRAYLENGTH(sd->autobonus3),true);
-
-	pc_itemgrouphealrate_clear(sd);
+	pc_delautobonus(sd, sd->autobonus, true);
+	pc_delautobonus(sd, sd->autobonus2, true);
+	pc_delautobonus(sd, sd->autobonus3, true);
 
 	//额外执行OnPCStatCalcEvent2事件 [kuku]
 	if (sd)
@@ -8302,10 +8300,12 @@ int status_get_sc_def(struct block_list *src, struct block_list *bl, enum sc_typ
 		}
 
 		// Item resistance (only applies to rate%)
-		if(sd && SC_COMMON_MIN <= type && type <= SC_COMMON_MAX) {
-			if( sd->reseff[type-SC_COMMON_MIN] )
-				rate -= rate*sd->reseff[type-SC_COMMON_MIN]/10000;
-			if( sd->sc.data[SC_COMMONSC_RESIST] )
+		if (sd) {
+			for (const auto &it : sd->reseff) {
+				if (it.id == type)
+					rate -= rate * it.val / 10000;
+			}
+			if (sd->sc.data[SC_COMMONSC_RESIST] && SC_COMMON_MIN <= type && type <= SC_COMMON_MAX)
 				rate -= rate*sd->sc.data[SC_COMMONSC_RESIST]->val1/100;
 		}
 
@@ -9014,7 +9014,6 @@ int status_change_start(struct block_list* src, struct block_list* bl,enum sc_ty
 			case SC__UNLUCKY:
 			case SC__WEAKNESS:
 			case SC_BITE:
-			case SC_ELECTRICSHOCKER:
 			case SC_MAGNETICFIELD:
 			case SC_NETHERWORLD:
 			case SC_CRESCENTELBOW:
@@ -9415,6 +9414,7 @@ int status_change_start(struct block_list* src, struct block_list* bl,enum sc_ty
 			case SC_OBLIVIONCURSE:
 			case SC_LEECHESEND:
 			case SC_CURSEDCIRCLE_TARGET:
+			case SC_ELECTRICSHOCKER:
 			case SC_BANDING_DEFENCE:
 			case SC__ENERVATION:
 			case SC__GROOMY:
@@ -13945,7 +13945,6 @@ void status_change_clear_buffs(struct block_list* bl, uint8 type)
 			case SC_EXPBOOST:
 			case SC_JEXPBOOST:
 			case SC_ITEMBOOST:
-			case SC_ELECTRICSHOCKER:
 			case SC__MANHOLE:
 			case SC_GIANTGROWTH:
 			case SC_MILLENNIUMSHIELD:
