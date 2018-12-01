@@ -1001,3 +1001,65 @@ BUILDIN_FUNC(enable_click)
 		nd->clickable = true;
 	return SCRIPT_CMD_SUCCESS;
 }
+
+
+/**
+ * 在NPC头顶显示进度条,同时保持关联人物
+ * progressbar_npc2 "<color>",<seconds>{,<"NPC Name">};
+ */
+BUILDIN_FUNC(progressbar_npc2){
+	struct npc_data* nd = NULL;
+
+	if( script_hasdata(st, 4) ){
+		const char* name = script_getstr(st, 4);
+
+		nd = npc_name2id(name);
+
+		if( !nd ){
+			ShowError( "buildin_progressbar_npc: NPC \"%s\" was not found.\n", name );
+			return SCRIPT_CMD_FAILURE;
+		}
+	}else{
+		nd = map_id2nd(st->oid);
+	}
+
+	// First call(by function call)
+	if( !nd->progressbar.timeout ){
+		const char *color;
+		int second;
+
+		color = script_getstr(st, 2);
+		second = script_getnum(st, 3);
+
+		if( second < 0 ){
+			ShowError( "buildin_progressbar_npc: negative amount('%d') of seconds is not supported\n", second );
+			return SCRIPT_CMD_FAILURE;
+		}
+
+		if (map_id2bl(st->rid) == NULL) {
+			ShowError( "buildin_progressbar_npc2: no unit is attached\n" );
+			return SCRIPT_CMD_FAILURE;
+		}
+
+		// sleep for the target amount of time
+		st->state = RERUNLINE;
+		st->sleep.tick = second * 1000;
+		nd->progressbar.timeout = gettick() + second * 1000;
+		nd->progressbar.color = strtol(color, (char **)NULL, 0);
+
+		clif_progressbar_npc_area(nd);
+	// Second call(by timer after sleeping time is over)
+	} else {
+		if (map_id2bl(st->rid) == NULL) {
+			st->rid = 0;
+			st->state = END;
+		} else {
+			// Continue the script
+			st->state = RUN;
+			st->sleep.tick = 0;
+			nd->progressbar.timeout = nd->progressbar.color = 0;
+		}
+	}
+
+	return SCRIPT_CMD_SUCCESS;
+}
