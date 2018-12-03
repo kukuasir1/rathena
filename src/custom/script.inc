@@ -962,46 +962,6 @@ BUILDIN_FUNC(pushunit)
 	return SCRIPT_CMD_SUCCESS;
 }
 
-/*
- * 禁止npc点击
- * disable_click {"<NPC_name>"};
- * @param NPC_name: NPC名
- * @author [kuku]
- */
-BUILDIN_FUNC(disable_click)
-{
-	TBL_NPC* nd;
-	
-	if (script_hasdata(st, 2) && strlen(script_getstr(st, 2)) > 0)
-		nd = npc_name2id(script_getstr(st, 2));
-	else
-		nd = map_id2nd(st->oid);
-	
-	if (nd)
-		nd->clickable = false;
-	return SCRIPT_CMD_SUCCESS;
-}
-
-/*
- * 允许npc点击
- * enable_click {"<NPC_name>"};
- * @param NPC_name: NPC名
- * @author [kuku]
- */
-BUILDIN_FUNC(enable_click)
-{
-	TBL_NPC* nd;
-	
-	if (script_hasdata(st, 2) && strlen(script_getstr(st, 2)) > 0)
-		nd = npc_name2id(script_getstr(st, 2));
-	else
-		nd = map_id2nd(st->oid);
-	
-	if (nd)
-		nd->clickable = true;
-	return SCRIPT_CMD_SUCCESS;
-}
-
 
 /**
  * 在NPC头顶显示进度条,同时保持关联人物
@@ -1016,7 +976,7 @@ BUILDIN_FUNC(progressbar_npc2){
 		nd = npc_name2id(name);
 
 		if( !nd ){
-			ShowError( "buildin_progressbar_npc: NPC \"%s\" was not found.\n", name );
+			ShowError( "buildin_progressbar_npc2: NPC \"%s\" was not found.\n", name );
 			return SCRIPT_CMD_FAILURE;
 		}
 	}else{
@@ -1032,7 +992,7 @@ BUILDIN_FUNC(progressbar_npc2){
 		second = script_getnum(st, 3);
 
 		if( second < 0 ){
-			ShowError( "buildin_progressbar_npc: negative amount('%d') of seconds is not supported\n", second );
+			ShowError( "buildin_progressbar_npc2: negative amount('%d') of seconds is not supported\n", second );
 			return SCRIPT_CMD_FAILURE;
 		}
 
