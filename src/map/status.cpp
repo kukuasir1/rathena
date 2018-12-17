@@ -2487,6 +2487,8 @@ unsigned short status_base_atk(const struct block_list *bl, const struct status_
 #ifdef RENEWAL
 			str = (dstr * 10 + dex * 10 / 5 + status->luk * 10 / 3 + level * 10 / 4) / 10;
 #else
+			dstr = str / 10;
+			str += dstr*dstr;
 			str += dex / 5 + status->luk / 5;
 #endif
 			break;
@@ -2494,6 +2496,8 @@ unsigned short status_base_atk(const struct block_list *bl, const struct status_
 #ifdef RENEWAL
 			str = dstr + level;
 #else
+			dstr = str / 10;
+			str += dstr*dstr;
 			str += dex / 5 + status->luk / 5;
 #endif
 			break;
