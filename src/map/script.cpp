@@ -10777,7 +10777,7 @@ BUILDIN_FUNC(getnpctimer)
 	struct npc_data *nd;
 	TBL_PC *sd;
 	int type = script_getnum(st,2);
-	int val = 0;
+	t_tick val = 0;
 
 	if( script_hasdata(st,3) )
 		nd = npc_name2id(script_getstr(st,3));
@@ -11487,7 +11487,8 @@ BUILDIN_FUNC(sc_end_class)
 BUILDIN_FUNC(getscrate)
 {
 	struct block_list *bl;
-	int type,rate;
+	int type;
+	t_tick rate;
 
 	type=script_getnum(st,2);
 	rate=script_getnum(st,3);
@@ -15185,7 +15186,7 @@ BUILDIN_FUNC(summon)
 	const char *str,*event="";
 	TBL_PC *sd;
 	struct mob_data *md;
-	int tick = gettick();
+	t_tick tick = gettick();
 
 	if (!script_rid2sd(sd))
 		return SCRIPT_CMD_SUCCESS;
@@ -24054,6 +24055,23 @@ BUILDIN_FUNC(is_party_leader)
 	return SCRIPT_CMD_SUCCESS;
 }
 
+BUILDIN_FUNC( camerainfo ){
+#if PACKETVER < 20160525
+	ShowError("buildin_camerainfo: This command requires PACKETVER 2016-05-25 or newer.\n");
+	return SCRIPT_CMD_FAILURE;
+#else
+	struct map_session_data* sd;
+
+	if( !script_charid2sd( 5, sd ) ){
+		return SCRIPT_CMD_FAILURE;
+	}
+
+	clif_camerainfo( sd, false, script_getnum( st, 2 ) / 100.0f, script_getnum( st, 3 ) / 100.0f, script_getnum( st, 4 ) / 100.0f );
+
+	return SCRIPT_CMD_SUCCESS;
+#endif
+}
+
 #include "../custom/script.inc"
 
 // declarations that were supposed to be exported from npc_chat.c
@@ -24716,6 +24734,7 @@ struct script_function buildin_func[] = {
 	BUILDIN_DEF(identifyall,"??"),
 	BUILDIN_DEF(is_guild_leader,"?"),
 	BUILDIN_DEF(is_party_leader,"?"),
+	BUILDIN_DEF(camerainfo,"iii?"),
 #include "../custom/script_def.inc"
 
 	{NULL,NULL,NULL},
