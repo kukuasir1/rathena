@@ -4936,7 +4936,7 @@ REPLACE INTO `item_db_re` VALUES (6914,'Black_Horn','Black Horn',3,10,NULL,0,NUL
 REPLACE INTO `item_db_re` VALUES (6915,'Captured_Soul','Captured Soul',3,10,NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (6916,'Piece_Of_Soul_Monkey','Piece Of Soul Monkey',3,10,NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (6917,'Piece_Of_Soul_Chicken','Piece Of Soul Chicken',3,10,NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-REPLACE INTO `item_db_re` VALUES (6919,'Honor_Proof','Honor Token',3,10,NULL,10,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+REPLACE INTO `item_db_re` VALUES (6919,'Honor_Proof','Honor Token',3,10,NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (6920,'Rune_Magic_Powder','Rune Magic Powder',3,10,NULL,10,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (6921,'Dehumidifiers','Dehumidifiers',3,10,NULL,10,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (6922,'Sandpaper','Sandpaper',3,10,NULL,10,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
@@ -9700,7 +9700,7 @@ REPLACE INTO `item_db_re` VALUES (18596,'Sprout_Hat','Sprout Hat',4,20,NULL,200,
 REPLACE INTO `item_db_re` VALUES (18597,'Mercury_Helm','Mercury Riser',4,40,NULL,200,NULL,10,NULL,1,0xFFFFFFFF,63,2,256,NULL,'0',1,759,'bonus2 bSubRace,RC_DemiHuman,10; bonus2 bAddRace,RC_DemiHuman,10; bonus bAspdRate,3; bonus bDelayrate,-3; .@r = getrefine(); if(.@r >= 7) { bonus bAspdRate,2; bonus bDelayrate,-2; } if(.@r >= 9) { bonus bAspdRate,2; bonus bDelayrate,-2; }',NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (18598,'Mini_Tree_J','Mini Tree J',4,20,NULL,50,NULL,0,NULL,1,0xFFFFFFFF,63,2,256,NULL,'0',0,727,'bonus bMdef,20;',NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (18599,'Black_Devil_Mask','Black Devil Mask',4,20,NULL,100,NULL,0,NULL,0,0xFFFFFFFF,63,2,512,NULL,'0',0,760,'bonus bAllStats,2;',NULL,NULL);
-REPLACE INTO `item_db_re` VALUES (18600,'Cat_Ears_Beret','Cat Ear Beret',4,20,NULL,100,NULL,5,NULL,1,0xFFFFFFFF,63,2,256,NULL,'0',1,761,'bonus2 bAddClass,Class_All,5; .@r = getrefine(); if(.@r < 5) .@r = 5; bonus2 bSubRace,RC_DemiHuman,(.@r - 5); bonus2 bAddRace,RC_DemiHuman,(.@r - 5);',NULL,NULL);
+REPLACE INTO `item_db_re` VALUES (18600,'Cat_Ears_Beret','Cat Ear Beret',4,20,NULL,100,NULL,5,NULL,1,0xFFFFFFFF,63,2,256,NULL,'0',1,761,'bonus2 bAddClass,Class_All,5; .@r = getrefine(); if(.@r < 5) .@r = 5; bonus2 bSubRace,RC_DemiHuman,(.@r - 5); bonus2 bAddRace,RC_DemiHuman,(.@r - 5); bonus2 bSubRace,RC_Player,(.@r - 5); bonus2 bAddRace,RC_Player,(.@r - 5);',NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (18601,'Red_Bread_Hat','Red Bread Hat',4,20,NULL,300,NULL,0,NULL,1,0xFFFFFFFF,63,2,256,NULL,'0',1,762,'bonus bMdef,5; .@r = getrefine(); if (.@r < 5) .@r = 5; bonus2 bSubRace,RC_DemiHuman,(.@r - 5); bonus2 bMagicAddRace,RC_DemiHuman,(.@r - 5);',NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (18602,'Watermelon_Slice','Watermelon Bite',4,20,NULL,100,NULL,4,NULL,0,0xFFFFFFFF,63,2,1,NULL,'30',0,763,NULL,NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (18603,'Black_Devil_Mask_','Black Devil Mask',4,20,NULL,100,NULL,0,NULL,1,0xFFFFFFFF,63,2,512,NULL,'0',0,760,'bonus bAllStats,1;',NULL,NULL);
@@ -10830,7 +10830,7 @@ REPLACE INTO `item_db_re` VALUES (20375,'C_Ignis_Cap','Costume Ignis Cap',4,0,NU
 REPLACE INTO `item_db_re` VALUES (20376,'C_Memory_of_Lovers','Costume Memory of Lovers',4,0,NULL,0,NULL,NULL,NULL,0,0xFFFFFFFF,63,2,2048,NULL,'1',1,1072,NULL,NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (20377,'C_Flight_Cap','Costume Flight Cap',4,0,NULL,0,NULL,NULL,NULL,0,0xFFFFFFFF,63,2,1024,NULL,'1',1,820,NULL,NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (20378,'C_Skymet','Costume Sky Met',4,0,NULL,0,NULL,NULL,NULL,0,0xFFFFFFFF,63,2,1024,NULL,'1',1,868,NULL,NULL,NULL);
-REPLACE INTO `item_db_re` VALUES (20379,'C_Pocketwatch_Hair_Ornament','Costume Pocketwatch Hair Ornament',4,0,NULL,0,NULL,NULL,NULL,0,0xFFFFFFFF,63,2,1024,NULL,'1',1,1404,NULL,NULL,NULL);
+REPLACE INTO `item_db_re` VALUES (20379,'C_Pocketwatch_Hair_Ornament','Costume Pocketwatch Hair Ornament',4,0,NULL,0,NULL,NULL,NULL,0,0xFFFFFFFF,63,2,2048,NULL,'1',1,1404,NULL,NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (20380,'C_Mechanical_Feather_Hairband','Costume Mechanical Feather Hairband',4,0,NULL,0,NULL,NULL,NULL,0,0xFFFFFFFF,63,2,1024,NULL,'1',1,1405,NULL,NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (20381,'C_Steampunk_Hat','Costume Steampunk Hat',4,0,NULL,0,NULL,NULL,NULL,0,0xFFFFFFFF,63,2,1024,NULL,'1',1,1406,NULL,NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (20382,'C_Silver_Sniper_Doll','Costume Silver Sniper Doll',4,0,NULL,0,NULL,NULL,NULL,0,0xFFFFFFFF,63,2,1024,NULL,'1',1,1407,NULL,NULL,NULL);
@@ -11809,7 +11809,7 @@ REPLACE INTO `item_db_re` VALUES (27163,'Faceworm_Card','Faceworm Card',6,20,NUL
 REPLACE INTO `item_db_re` VALUES (27164,'Faceworm_Queen_Card','Faceworm Queen Card',6,20,NULL,10,NULL,NULL,NULL,NULL,NULL,NULL,NULL,64,NULL,NULL,NULL,NULL,'bonus bMaxHPrate,-10; .@r = getrefine(); bonus bCritical,15 + .@r; bonus bCritAtkRate,.@r;',NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (27165,'Dark_Faceworm_Card','Dark Faceworm Card',6,20,NULL,10,NULL,NULL,NULL,NULL,NULL,NULL,NULL,136,NULL,NULL,NULL,NULL,'bonus bVit,-1; bonus bInt,-1; bonus bDelayrate,-3;',NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (27166,'Faceworm_Egg_Card','Faceworm Egg Card',6,20,NULL,10,NULL,NULL,NULL,NULL,NULL,NULL,NULL,64,NULL,NULL,NULL,NULL,'.@r = getrefine(); .@sub = 2+(.@r >= 9 ? 3 : .@r >= 7 ? 1 : 0); bonus bNearAtkDef,.@sub; bonus bMagicAtkDef,.@sub;',NULL,NULL);
-REPLACE INTO `item_db_re` VALUES (27167,'Faceworm_Larva_Card','Faceworm Larva Card',6,20,NULL,10,NULL,NULL,NULL,NULL,NULL,NULL,NULL,4,NULL,NULL,NULL,NULL,'bonus2 bSubEle,Ele_Neutral,15; bonus2 bMagicAddSize,Size_All,getrefine()*3;',NULL,NULL);
+REPLACE INTO `item_db_re` VALUES (27167,'Faceworm_Larva_Card','Faceworm Larva Card',6,20,NULL,10,NULL,NULL,NULL,NULL,NULL,NULL,NULL,4,NULL,NULL,NULL,NULL,'bonus2 bSubEle,Ele_Neutral,15; bonus2 bMagicAtkEle,Ele_Water,getrefine()*3;',NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (27168,'Irene_High_Elder_Card','Irene High Elder Card',6,20,NULL,10,NULL,NULL,NULL,NULL,NULL,NULL,NULL,4,NULL,NULL,NULL,NULL,'bonus bHit,10 + 5 * (getrefine()/3);',NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (27169,'Payon_Soldier_Card','Payon Soldier Card',6,20,NULL,10,NULL,NULL,NULL,NULL,NULL,NULL,NULL,2,NULL,NULL,NULL,NULL,'.@atk = 5; .@r = getrefine(); if(getiteminfo(getequipid(EQI_HAND_R),11) == W_SPEAR && .@r >= 10){ .@atk += 20; if(.@r >= 14){ .@atk += 20; } } bonus bAtk,.@atk; bonus bMatk,.@atk;',NULL,NULL);
 REPLACE INTO `item_db_re` VALUES (27170,'Shotgun_Buffalo_Bandit_Card','Shotgun Buffalo Bandit Card',6,20,NULL,10,NULL,NULL,NULL,NULL,NULL,NULL,NULL,128,NULL,NULL,NULL,NULL,'bonus bAgi,7; bonus bHit,7;',NULL,NULL);
