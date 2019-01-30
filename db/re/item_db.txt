@@ -7458,12 +7458,12 @@
 13272,Cure_Free_To_Throw,Throwing Cure Free,10,100,,50,0,,,,0x00040000,56,2,32768,,99,,9,{ sc_end SC_BLEEDING; sc_end SC_CURSE; sc_end SC_SILENCE; sc_end SC_POISON; sc_end SC_ORCISH; sc_end SC_CHANGEUNDEAD; sc_end SC_BLIND; sc_end SC_CONFUSION; sc_end SC_DPOISON; itemheal 500,0; },{},{}
 13273,Stamina_Up_M_To_Throw,Throwing Muramura M,10,100,,10,0,,,,0x00040000,56,2,32768,,99,,9,{ sc_start SC_MUSTLE_M,500000,5; },{},{}
 13274,Digestive_F_To_Throw,Throwing Falmons F,10,100,,10,0,,,,0x00040000,56,2,32768,,99,,9,{ sc_start SC_LIFE_FORCE_F,500000,5; },{},{}
-13275,HP_Inc_PotS_To_Throw,Throwing Increase HP Potion (Small),10,100,,20,0,,,,0x00040000,56,2,32768,,99,,9,{ sc_start SC_PROMOTE_HEALTH_RESERCH,500000,(500+(BaseLevel*10/3)); percentheal 1,0; },{},{}
-13276,HP_Inc_PotM_To_Throw,Throwing Increase HP Potion (Medium),10,100,,40,0,,,,0x00040000,56,2,32768,,99,,9,{ sc_start SC_PROMOTE_HEALTH_RESERCH,500000,(1500+(BaseLevel*10/3)); percentheal 2,0; },{},{}
-13277,HP_Inc_PotL_To_Throw,Throwing Increase HP Potion (Large),10,100,,80,0,,,,0x00040000,56,2,32768,,99,,9,{ sc_start SC_PROMOTE_HEALTH_RESERCH,500000,(2500+(BaseLevel*10/3)); percentheal 5,0; },{},{}
-13278,SP_Inc_PotS_To_Throw,Throwing Increase SP Potion (Small),10,100,,20,0,,,,0x00040000,56,2,32768,,99,,9,{ sc_start SC_ENERGY_DRINK_RESERCH,500000,((BaseLevel/10)-5); percentheal 0,2; },{},{}
-13279,SP_Inc_PotM_To_Throw,Throwing Increase SP Potion (Medium),10,100,,40,0,,,,0x00040000,56,2,32768,,99,,9,{ sc_start SC_ENERGY_DRINK_RESERCH,500000,((BaseLevel/10)); percentheal 0,4; },{},{}
-13280,SP_Inc_PotL_To_Throw,Throwing Increase SP Potion (Large),10,100,,80,0,,,,0x00040000,56,2,32768,,99,,9,{ sc_start SC_ENERGY_DRINK_RESERCH,500000,((BaseLevel/10)+5); percentheal 0,8; },{},{}
+13275,HP_Inc_PotS_To_Throw,Throwing Increase HP Potion (Small),10,100,,20,0,,,,0x00040000,56,2,32768,,99,,9,{ /* Item bonus in source because of BaseLevel check */ },{},{}
+13276,HP_Inc_PotM_To_Throw,Throwing Increase HP Potion (Medium),10,100,,40,0,,,,0x00040000,56,2,32768,,99,,9,{ /* Item bonus in source because of BaseLevel check */ },{},{}
+13277,HP_Inc_PotL_To_Throw,Throwing Increase HP Potion (Large),10,100,,80,0,,,,0x00040000,56,2,32768,,99,,9,{ /* Item bonus in source because of BaseLevel check */ },{},{}
+13278,SP_Inc_PotS_To_Throw,Throwing Increase SP Potion (Small),10,100,,20,0,,,,0x00040000,56,2,32768,,99,,9,{ /* Item bonus in source because of BaseLevel check */ },{},{}
+13279,SP_Inc_PotM_To_Throw,Throwing Increase SP Potion (Medium),10,100,,40,0,,,,0x00040000,56,2,32768,,99,,9,{ /* Item bonus in source because of BaseLevel check */ },{},{}
+13280,SP_Inc_PotL_To_Throw,Throwing Increase SP Potion (Large),10,100,,80,0,,,,0x00040000,56,2,32768,,99,,9,{ /* Item bonus in source because of BaseLevel check */ },{},{}
 13281,En_White_PotZ_To_Throw,Throwing Concentrated White Potion Z,10,100,,70,0,,,,0x00040000,56,2,32768,,99,,9,{ sc_start SC_EXTRACT_WHITE_POTION_Z,500000,20; itemheal 1000,0; },{},{}
 13282,Vitata500_To_Throw,Throwing Vitata 500,10,100,,50,0,,,,0x00040000,56,2,32768,,99,,9,{ sc_start2 SC_VITATA_500,500000,20,5; itemheal 0,200; },{},{}
 13283,En_Cel_Juice_To_Throw,Throwing Ceromain Soup,10,100,,50,0,,,,0x00040000,56,2,32768,,99,,9,{ sc_start SC_EXTRACT_SALAMINE_JUICE,500000,10; },{},{}
@@ -8735,7 +8735,7 @@
 15111,Upgrade_Part_Plate,Reinforced Parts - Gloves,4,10,,3000,,110,,,0x00000400,56,2,16,,100,1,,{ bonus bUnbreakableArmor; bonus2 bSubSize,0,10; bonus2 bSubSize,1,10; .@r = getrefine(); if(.@r>=7){ bonus2 bSubSize,2,10; }; if(.@r>=9){ bonus2 bSubSize,0,5; bonus2 bSubSize,1,5; } },{},{}
 15116,Airship_Armor,Airship's Armor,4,10,,700,,100,,0,0xFFFFFFFF,63,2,16,,125,0,,{ bonus bMaxHP,1000; bonus bMaxSP,100; bonus bMdef,10; bonus bAllStats,1; },{},{}
 15117,Felock_Armor,Felrock's Armor,4,10,,750,,70,,0,0xFFFFFFFF,63,2,16,,125,1,,{ bonus bMaxHP,500; bonus bMaxSP,50; bonus bMdef,10; bonus bAllStats,1; .@r = getrefine(); if(.@r>=7) { bonus bMaxHP,500; bonus bMaxSP,50; } if(.@r>=9) { bonus bMaxHP,200; bonus bMaxSP,20; } if(.@r>=12) { bonus bMaxHP,300; bonus bMaxSP,30; } },{},{}
-15121,Robe_Of_Sarah,Sarah Combat Robe,4,10,,800,,35,,1,0xFFFFFFFF,63,2,16,,145,1,,{ /*TODO: Confirm the real rate and additional MAtk*/ .@r = getrefine(); autobonus "{ bonus bMatk,20; }",100,(10+((.@r) ? .@r*8 : 0))*1000,BF_MAGIC;},{},{}
+15121,Robe_Of_Sarah,Sarah's Battle Robe,4,10,,800,,35,,1,0xFFFFFFFF,63,2,16,,145,1,,{ autobonus "{ bonus bMatk,getrefine()*8; }",3,10000,BF_MAGIC; },{},{}
 15123,Whikebain_Suit,Whikebain Suit,4,0,,900,,56,,1,0x00001000,56,2,16,,105,1,,{ .@r = getrefine(); bonus bCritAtkRate,(.@r>=7)?(6):((.@r>=5)?(4):(0)); bonus3 bAutoSpell,"DC_WINKCHARM",1,10; /* Confirm: Success rate */ },{},{}
 15126,Female_Poring_Balloon,Private Doram Suits,4,20,,700,,80,,1,0x80000000,7,2,16,,100,1,,{ bonus bMaxHP,500; bonus bMaxSP,100; .@r = getrefine()/3; bonus bDex,.@r; bonus bInt,.@r; },{},{}
 15128,Excelion_Suit,Excelion Suit,4,20,,1000,,100,,0,0xFFFFFFFF,63,2,16,,99,1,,{ bonus bVit,6 + (BaseLevel > 129 ? 4 : 0); bonus bMaxHPrate,(getrefine() / 3) * 4; bonus bUnbreakableArmor; },{},{}
