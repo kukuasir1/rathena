@@ -20078,6 +20078,11 @@ int skill_elementalanalysis(struct map_session_data* sd, int n, uint16 skill_lv,
 		struct item tmp_item;
 
 		idx = item_list[i*2+0]-2;
+
+		if( idx < 0 || idx >= MAX_INVENTORY ){
+			return 1;
+		}
+
 		del_amount = item_list[i*2+1];
 
 		if( skill_lv == 2 )
@@ -20151,6 +20156,11 @@ int skill_changematerial(struct map_session_data *sd, int n, unsigned short *ite
 					if( skill_produce_db[i].mat_id[j] > 0 ) {
 						for( k = 0; k < n; k++ ) {
 							int idx = item_list[k*2+0]-2;
+
+							if( idx < 0 || idx >= MAX_INVENTORY ){
+								return 0;
+							}
+
 							nameid = sd->inventory.u.items_inventory[idx].nameid;
 							amount = item_list[k*2+1];
 							if( nameid > 0 && sd->inventory.u.items_inventory[idx].identify == 0 ){
