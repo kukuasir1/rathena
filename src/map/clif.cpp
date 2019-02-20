@@ -10860,15 +10860,7 @@ void clif_parse_WalkToXY(int fd, struct map_session_data *sd)
 		; //You CAN walk on this OPT1 value.
 	else if (sd->progressbar.npc_id) {
 		clif_progressbar_abort(sd);
-		// 如果没有对话框, 则执行end; 否则添加close按钮 [kuku]
-		if (!sd->st->mes_active) {
-			sd->st->state = END;
-		}
-		else {
-			sd->st->state = CLOSE;
-			sd->st->mes_active = 0;
-			clif_scriptclose(sd, sd->st->oid);
-		}
+		// 关闭立绘 [kuku]
 		clif_cutin(sd, "", 255);
 		return; // First walk attempt cancels the progress bar
 	} else if (pc_cant_act(sd))
