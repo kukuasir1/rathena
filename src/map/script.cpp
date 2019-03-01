@@ -23369,7 +23369,7 @@ BUILDIN_FUNC(achievementadd) {
 		return SCRIPT_CMD_FAILURE;
 	}
 
-	if (achievement_exists(achievement_id) == false) {
+	if (achievement_db.exists(achievement_id) == false) {
 		ShowWarning("buildin_achievementadd: Achievement '%d' doesn't exist.\n", achievement_id);
 		script_pushint(st, false);
 		return SCRIPT_CMD_FAILURE;
@@ -23406,7 +23406,7 @@ BUILDIN_FUNC(achievementremove) {
 		return SCRIPT_CMD_FAILURE;
 	}
 
-	if (achievement_exists(achievement_id) == false) {
+	if (achievement_db.exists(achievement_id) == false) {
 		ShowWarning("buildin_achievementremove: Achievement '%d' doesn't exist.\n", achievement_id);
 		script_pushint(st, false);
 		return SCRIPT_CMD_SUCCESS;
@@ -23442,7 +23442,7 @@ BUILDIN_FUNC(achievementinfo) {
 		return SCRIPT_CMD_FAILURE;
 	}
 
-	if (achievement_exists(achievement_id) == false) {
+	if (achievement_db.exists(achievement_id) == false) {
 		ShowWarning("buildin_achievementinfo: Achievement '%d' doesn't exist.\n", achievement_id);
 		script_pushint(st, false);
 		return SCRIPT_CMD_FAILURE;
@@ -23476,7 +23476,7 @@ BUILDIN_FUNC(achievementcomplete) {
 		return SCRIPT_CMD_FAILURE;
 	}
 
-	if (achievement_exists(achievement_id) == false) {
+	if (achievement_db.exists(achievement_id) == false) {
 		ShowWarning("buildin_achievementcomplete: Achievement '%d' doesn't exist.\n", achievement_id);
 		script_pushint(st, false);
 		return SCRIPT_CMD_FAILURE;
@@ -23513,7 +23513,7 @@ BUILDIN_FUNC(achievementexists) {
 		return SCRIPT_CMD_FAILURE;
 	}
 
-	if (achievement_exists(achievement_id) == false) {
+	if (achievement_db.exists(achievement_id) == false) {
 		ShowWarning("buildin_achievementexists: Achievement '%d' doesn't exist.\n", achievement_id);
 		script_pushint(st, false);
 		return SCRIPT_CMD_SUCCESS;
@@ -23552,7 +23552,7 @@ BUILDIN_FUNC(achievementupdate) {
 		return SCRIPT_CMD_FAILURE;
 	}
 
-	if (achievement_exists(achievement_id) == false) {
+	if (achievement_db.exists(achievement_id) == false) {
 		ShowWarning("buildin_achievementupdate: Achievement '%d' doesn't exist.\n", achievement_id);
 		script_pushint(st, false);
 		return SCRIPT_CMD_FAILURE;
