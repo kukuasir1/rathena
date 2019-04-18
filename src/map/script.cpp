@@ -6791,8 +6791,8 @@ static int script_getitem_randomoption(struct script_state *st, struct map_sessi
  * @return Total count of item being searched
  */
 int script_countitem_sub(struct item *items, struct item_data *id, int size, bool expanded, bool random_option, struct script_state *st, struct map_session_data *sd) {
-	nullpo_retr(SCRIPT_CMD_FAILURE, items);
-	nullpo_retr(SCRIPT_CMD_FAILURE, st);
+	nullpo_retr(-1, items);
+	nullpo_retr(-1, st);
 
 	int count = 0;
 
@@ -6818,13 +6818,15 @@ int script_countitem_sub(struct item *items, struct item_data *id, int size, boo
 		it.card[3] = script_getnum(st,9);
 
 		if (random_option) {
-			if (!sd)
-				return SCRIPT_CMD_FAILURE;
+			if (!sd) {
+				ShowError("buildin_countitem3: Player not attached.\n");
+				return -1;
+			}
 
 			int res = script_getitem_randomoption(st, sd, &it, "countitem3", 10);
 
 			if (res != SCRIPT_CMD_SUCCESS)
-				return SCRIPT_CMD_FAILURE;
+				return -1;
 		}
 
 		for (int i = 0; i < size; i++) {
@@ -6899,7 +6901,12 @@ BUILDIN_FUNC(countitem)
 		return SCRIPT_CMD_FAILURE;
 	}
 
-	script_pushint(st, script_countitem_sub(sd->inventory.u.items_inventory, id, MAX_INVENTORY, (aid > 3) ? true : false, random_option, st, sd));
+	int count = script_countitem_sub(sd->inventory.u.items_inventory, id, MAX_INVENTORY, (aid > 3) ? true : false, random_option, st, sd);
+	if (count < 0) {
+		st->state = END;
+		return SCRIPT_CMD_FAILURE;
+	}
+	script_pushint(st, count);
 	return SCRIPT_CMD_SUCCESS;
 }
 
@@ -6947,7 +6954,12 @@ BUILDIN_FUNC(cartcountitem)
 		return SCRIPT_CMD_FAILURE;
 	}
 
-	script_pushint(st, script_countitem_sub(sd->cart.u.items_cart, id, MAX_CART, (aid > 3) ? true : false, false, st, nullptr));
+	int count = script_countitem_sub(sd->cart.u.items_cart, id, MAX_CART, (aid > 3) ? true : false, false, st, nullptr);
+	if (count < 0) {
+		st->state = END;
+		return SCRIPT_CMD_FAILURE;
+	}
+	script_pushint(st, count);
 	return SCRIPT_CMD_SUCCESS;
 }
 
@@ -6994,7 +7006,12 @@ BUILDIN_FUNC(storagecountitem)
 		return SCRIPT_CMD_SUCCESS;
 	}
 
-	script_pushint(st, script_countitem_sub(sd->storage.u.items_storage, id, MAX_STORAGE, (aid > 3) ? true : false, false, st, nullptr));
+	int count = script_countitem_sub(sd->storage.u.items_storage, id, MAX_STORAGE, (aid > 3) ? true : false, false, st, nullptr);
+	if (count < 0) {
+		st->state = END;
+		return SCRIPT_CMD_FAILURE;
+	}
+	script_pushint(st, count);
 	return SCRIPT_CMD_SUCCESS;
 }
 
@@ -7049,6 +7066,11 @@ BUILDIN_FUNC(guildstoragecountitem)
 
 	storage_guild_storageclose(sd);
 	gstor->lock = false;
+
+	if (count < 0) {
+		st->state = END;
+		return SCRIPT_CMD_FAILURE;
+	}
 
 	script_pushint(st, count);
 	return SCRIPT_CMD_SUCCESS;
