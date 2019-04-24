@@ -12,3 +12,4 @@
  **/
 
 	{ "mvp_tomb_name_type",                &battle_config.mvp_tomb_name_type,             1,      0,      1,    },
+	{ "ammo_decrement_weapon_attack",      &battle_config.ammo_decrement_weapon_attack,   1,      0,      1,    },

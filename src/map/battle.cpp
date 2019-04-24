@@ -2104,6 +2104,10 @@ void battle_consume_ammo(struct map_session_data*sd, int skill, int lv)
 	if (!battle_config.arrow_decrement)
 		return;
 
+	//skill为0为普通攻击, 如果ammo_decrement_weapon_attack为0,则不消耗弹药 [kuku]
+	if (!skill && !battle_config.ammo_decrement_weapon_attack)
+		return;
+
 	if (skill) {
 		qty = skill_get_ammo_qty(skill, lv);
 		if (!qty) qty = 1;
@@ -7345,6 +7349,7 @@ enum damage_lv battle_weapon_attack(struct block_list* src, struct block_list* t
 			}
 		}
 	}
+
 	if (sd && sd->state.arrow_atk) //Consume arrow.
 		battle_consume_ammo(sd, 0, 0);
 

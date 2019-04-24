@@ -12,3 +12,4 @@
  *	 <datatype> name;
  **/
 	int mvp_tomb_name_type; //设置mob tomb上怪物名称类型, 0: name 1: jname [kuku]
+	int	ammo_decrement_weapon_attack; //普通武器攻击弹药是否消耗. 1:消耗, 0:不消耗
