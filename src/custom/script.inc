@@ -1023,3 +1023,370 @@ BUILDIN_FUNC(progressbar_npc2){
 
 	return SCRIPT_CMD_SUCCESS;
 }
+
+/**
+ * 改版mail指令, 支持identify, identify, attribute数组参数,其它说明参照mail指令
+ * mail2 <destination id>,"<sender name>","<title>","<body>"{,<zeny>{,<item id array>,<item amount array>{,<item identify array>{,<item identify array>{,<item attribute array>{,<item card0 array>{,<item card1 array>{,<item card2 array>{,<item card3 array>
+		{,<random option id0 array>, <random option value0 array>, <random option paramter0 array>{,<random option id1 array>, <random option value1 array>, <random option paramter1 array>
+		{,<random option id2 array>, <random option value2 array>, <random option paramter2 array>{,<random option id3 array>, <random option value3 array>, <random option paramter3 array>
+		{,<random option id4 array>, <random option value4 array>, <random option paramter4 array>}}}}}}}}}};
+ */
+BUILDIN_FUNC(mail2) {
+	const char *sender, *title, *body, *name;
+	struct mail_message msg;
+	struct script_data *data;
+	struct map_session_data *sd = NULL;
+	unsigned int i, j, k, num_items, start, end;
+	int32 id;
+	//为mail_message结构体分配内存
+	memset(&msg, 0, sizeof(struct mail_message));
+
+	//根据第1参数<destination id>获得收件人charid
+	msg.dest_id = script_getnum(st, 2);
+
+	//根据第2参数"<sender name>"获得发送者姓名的字符串
+	sender = script_getstr(st, 3);
+
+	//如果发送者姓名字符串超长, 则报错并返回失败
+	if (strlen(sender) > NAME_LENGTH) {
+		ShowError("buildin_mail: sender name can not be longer than %d characters.\n", NAME_LENGTH);
+		return SCRIPT_CMD_FAILURE;
+	}
+
+	//将sender安全复制进mail_message中的发送者姓名中
+	safestrncpy(msg.send_name, sender, NAME_LENGTH);
+
+	//根据第3参数获得发送标题字符串
+	title = script_getstr(st, 4);
+
+	//如果发送标题字符串超长, 则报错并返回失败
+	if (strlen(title) > MAIL_TITLE_LENGTH) {
+		ShowError("buildin_mail: title can not be longer than %d characters.\n", MAIL_TITLE_LENGTH);
+		return SCRIPT_CMD_FAILURE;
+	}
+
+	//将title安全复制进mail_message中的标题中
+	safestrncpy(msg.title, title, MAIL_TITLE_LENGTH);
+
+	//根据第4参数获得邮件内容字符串
+	body = script_getstr(st, 5);
+
+	//如果邮件内容字符串超长, 则报错并返回失败
+	if (strlen(body) > MAIL_BODY_LENGTH) {
+		ShowError("buildin_mail: body can not be longer than %d characters.\n", MAIL_BODY_LENGTH);
+		return SCRIPT_CMD_FAILURE;
+	}
+
+	//将body安全复制进mail_message中的邮件内容中
+	safestrncpy(msg.body, body, MAIL_BODY_LENGTH);
+
+	//如果有第5个参数<zeny>
+	if (script_hasdata(st, 6)) {
+		//获取第5个参数<zeny>
+		int zeny = script_getnum(st, 6);
+
+		if (zeny < 0) {
+			//如果zeny为负数则报错并返回失败
+			ShowError("buildin_mail: a negative amount of zeny can not be sent.\n");
+			return SCRIPT_CMD_FAILURE;
+		}
+		else if (zeny > MAX_ZENY) {
+			//如果zeny大于金币上限则报错
+			ShowError("buildin_mail: amount of zeny %u is exceeding maximum of %u. Capping...\n", zeny, MAX_ZENY);
+			//强制复制zeny为金币上限
+			zeny = MAX_ZENY;
+		}
+		//将zeny赋值给mail_message中的付带zeny中
+		msg.zeny = zeny;
+	}
+
+	// Items
+	//初始化num_items
+	num_items = 0;
+	//如果有第6个参数<item id array>则进行循环
+	while (script_hasdata(st, 7)) {
+		//获得第6个参数<item id array>
+		data = script_getdata(st, 7);
+		//通过mail_sub验证数组的合法性,并返回数组名,起始索引,结束索引,uid
+		if (!mail_sub(st, data, sd, 7, &name, &start, &end, &id)) {
+			//验证不过则返回失败
+			return SCRIPT_CMD_FAILURE;
+		}
+
+		//获取实际物品数量
+		num_items = end - start;
+
+		//如果num_items为0提示无物品并跳出循环
+		if (num_items == 0) {
+			ShowWarning("buildin_mail: array \"%s\" contained no items.\n", name);
+			break;
+		}
+
+		//如果num_items超过最大邮寄物品数提示超限
+		if (num_items > MAIL_MAX_ITEM) {
+			ShowWarning("buildin_mail: array \"%s\" contained %d items, capping to maximum of %d...\n", name, num_items, MAIL_MAX_ITEM);
+			//num_items强制赋值最大邮寄物品数
+			num_items = MAIL_MAX_ITEM;
+		}
+
+		//循环所有物品
+		for (i = 0; i < num_items && start < end; i++, start++) {
+			//取得start索引的的数组整数元素,放入栈顶
+			msg.item[i].nameid = (int32)__64BPRTSIZE(get_val2(st, reference_uid(id, start), reference_getref(data)));
+			//强制此道具为已鉴定???
+			//msg.item[i].identify = 1;
+			//get_val2使用之后必须手动清除栈顶
+			script_removetop(st, -1, 0);
+
+			//如果该物品id无效则返回失败
+			if (!itemdb_exists(msg.item[i].nameid)) {
+				ShowError("buildin_mail: invalid item id %hu.\n", msg.item[i].nameid);
+				return SCRIPT_CMD_FAILURE;
+			}
+		}
+
+		// Amounts
+		//如果没有第7个参数<item amount array>则报错并返回失败
+		if (!script_hasdata(st, 8)) {
+			ShowError("buildin_mail: missing item count variable at position %d.\n", 8);
+			return SCRIPT_CMD_FAILURE;
+		}
+
+		//获取第7个参数<item amount array>
+		data = script_getdata(st, 8);
+
+		//通过mail_sub验证数组的合法性,并返回数组名,起始索引,结束索引,uid
+		if (!mail_sub(st, data, sd, 8, &name, &start, &end, &id)) {
+			return SCRIPT_CMD_FAILURE;
+		}
+
+		//循环所有物品
+		for (i = 0; i < num_items && start < end; i++, start++) {
+			//根据msg中已存的物品id获得该物品数据
+			struct item_data *item = itemdb_exists(msg.item[i].nameid);
+
+			//取得start索引的的数组整数元素,放入栈顶并赋值给邮件中对应物品的数量
+			msg.item[i].amount = (int32)__64BPRTSIZE(get_val2(st, reference_uid(id, start), reference_getref(data)));
+
+			//get_val2使用之后必须手动清除栈顶
+			script_removetop(st, -1, 0);
+
+			if (msg.item[i].amount <= 0) {
+				//数量小于0则报错并返回失败
+				ShowError("buildin_mail: amount %d for item %hu is invalid.\n", msg.item[i].amount, msg.item[i].nameid);
+				return SCRIPT_CMD_FAILURE;
+			}
+			else if (itemdb_isstackable2(item)) {
+				//如果物品可堆叠
+				//如果此物品有设置最大堆叠数量则使用,没有就使用MAX_AMOUNT
+				uint16 max = item->stack.amount > 0 ? item->stack.amount : MAX_AMOUNT;
+
+				//如果物品数量超过最大堆叠数量则报错,并强制赋值max
+				if (msg.item[i].amount > max) {
+					ShowWarning("buildin_mail: amount %d for item %hu is exceeding the maximum of %d. Capping...\n", msg.item[i].amount, msg.item[i].nameid, max);
+					msg.item[i].amount = max;
+				}
+			}
+			else {
+				//非堆叠物品
+				//如果数量大于1则报错,并强制赋值1
+				if (msg.item[i].amount > 1) {
+					ShowWarning("buildin_mail: amount %d is invalid for non-stackable item %hu.\n", msg.item[i].amount, msg.item[i].nameid);
+					msg.item[i].amount = 1;
+				}
+			}
+		}
+
+		//identify
+		//没有第8个参数,直接跳出循环
+		if (!script_hasdata(st, 9)) {
+			break;
+		}
+
+		//获取第8个参数<item identify array>
+		data = script_getdata(st, 9);
+		//通过mail_sub验证数组的合法性,并返回数组名,起始索引,结束索引,uid
+		if (!mail_sub(st, data, sd, 9, &name, &start, &end, &id)) {
+			return SCRIPT_CMD_FAILURE;
+		}
+
+		//循环所有物品
+		for (i = 0; i < num_items && start < end; i++, start++) {
+			//根据msg中已存的物品id获得该物品数据
+			struct item_data *item = itemdb_exists(msg.item[i].nameid);
+
+			msg.item[i].identify = (int32)__64BPRTSIZE(get_val2(st, reference_uid(id, start), reference_getref(data)));
+			script_removetop(st, -1, 0);
+			//如果identify为非0则赋值1,为0则根据db判断是否能鉴定
+			msg.item[i].identify = msg.item[i].identify ? 1 : itemdb_isidentified(msg.item[i].nameid);
+		}
+
+		//refine
+		//没有第9个参数,直接跳出循环
+		if (!script_hasdata(st, 10)) {
+			break;
+		}
+
+		//获取第9个参数<item refine array>
+		data = script_getdata(st, 10);
+		//通过mail_sub验证数组的合法性,并返回数组名,起始索引,结束索引,uid
+		if (!mail_sub(st, data, sd, 10, &name, &start, &end, &id)) {
+			return SCRIPT_CMD_FAILURE;
+		}
+
+		//循环所有物品
+		for (i = 0; i < num_items && start < end; i++, start++) {
+			//根据msg中已存的物品id获得该物品数据
+			struct item_data *item = itemdb_exists(msg.item[i].nameid);
+
+			msg.item[i].refine = (int32)__64BPRTSIZE(get_val2(st, reference_uid(id, start), reference_getref(data)));
+			script_removetop(st, -1, 0);
+
+			if (item->type == IT_WEAPON || item->type == IT_ARMOR || item->type == IT_SHADOWGEAR) {
+				if (msg.item[i].refine > MAX_REFINE) {
+					ShowWarning("buildin_mail: refine %d for item %hu is exceeding the maximum of %d. Capping...\n", msg.item[i].refine, msg.item[i].nameid, MAX_REFINE);
+					msg.item[i].refine = MAX_REFINE;
+				}
+			}
+			else {
+				msg.item[i].refine = 0;
+			}
+		}
+
+		//attribute
+		//没有第10个参数,直接跳出循环
+		if (!script_hasdata(st, 11)) {
+			break;
+		}
+
+		//获取第10个参数<item attribute array>
+		data = script_getdata(st, 11);
+		//通过mail_sub验证数组的合法性,并返回数组名,起始索引,结束索引,uid
+		if (!mail_sub(st, data, sd, 11, &name, &start, &end, &id)) {
+			return SCRIPT_CMD_FAILURE;
+		}
+
+		//循环所有物品
+		for (i = 0; i < num_items && start < end; i++, start++) {
+			//根据msg中已存的物品id获得该物品数据
+			struct item_data *item = itemdb_exists(msg.item[i].nameid);
+
+			msg.item[i].attribute = (int32)__64BPRTSIZE(get_val2(st, reference_uid(id, start), reference_getref(data)));
+			script_removetop(st, -1, 0);
+
+			if (item->type == IT_WEAPON || item->type == IT_ARMOR || item->type == IT_SHADOWGEAR) {
+				msg.item[i].attribute = msg.item[i].attribute ? 1 : 0;
+			}
+			else {
+				msg.item[i].attribute = 0;
+			}
+		}
+
+
+		// Cards
+		//如果没有第11参数<item card0 array>则跳出循环
+		if (!script_hasdata(st, 12)) {
+			break;
+		}
+
+		//从第11参数循环到14参数(卡片)
+		for (i = 0, j = 12; i < MAX_SLOTS && script_hasdata(st, j); i++, j++) {
+			//获得卡片数组数据
+			data = script_getdata(st, j);
+
+			//验证数组
+			if (!mail_sub(st, data, sd, j + 1, &name, &start, &end, &id)) {
+				return SCRIPT_CMD_FAILURE;
+			}
+
+			//遍历所有已有物品
+			for (k = 0; k < num_items && start < end; k++, start++) {
+				//获得卡片id
+				msg.item[k].card[i] = (int32)__64BPRTSIZE(get_val2(st, reference_uid(id, start), reference_getref(data)));
+				//清除栈顶
+				script_removetop(st, -1, 0);
+				//如果卡片id不为0但是此id不存在则报错并返回失败
+				if (msg.item[k].card[i] != 0 && !itemdb_exists(msg.item[k].card[i])) {
+					ShowError("buildin_mail: invalid card id %hu.\n", msg.item[k].card[i]);
+					return SCRIPT_CMD_FAILURE;
+				}
+			}
+		}
+
+		// Random Options
+		//如果没有15参数<random option id0 array>则跳出循环
+		if (!script_hasdata(st, 12 + MAX_SLOTS)) {
+			break;
+		}
+
+		//从第15到最后
+		for (i = 0, j = 12 + MAX_SLOTS; i < MAX_ITEM_RDM_OPT && script_hasdata(st, j) && script_hasdata(st, j + 1) && script_hasdata(st, j + 2); i++, j++) {
+			// Option IDs
+			//获得随机属性id数组
+			data = script_getdata(st, j);
+
+			//验证数组
+			if (!mail_sub(st, data, sd, j + 1, &name, &start, &end, &id)) {
+				return SCRIPT_CMD_FAILURE;
+			}
+
+			//遍历所有已有物品
+			for (k = 0; k < num_items && start < end; k++, start++) {
+				//获得属性id
+				msg.item[k].option[i].id = (int32)__64BPRTSIZE(get_val2(st, reference_uid(id, start), reference_getref(data)));
+
+				//清除栈顶
+				script_removetop(st, -1, 0);
+			}
+
+			j++;
+
+			// Option values
+			//获得随机属性value数组
+			data = script_getdata(st, j);
+
+			//验证数组
+			if (!mail_sub(st, data, sd, j + 1, &name, &start, &end, &id)) {
+				return SCRIPT_CMD_FAILURE;
+			}
+
+			//遍历所有已有物品
+			for (k = 0; k < num_items && start < end; k++, start++) {
+				//获得属性id对应的value
+				msg.item[k].option[i].value = (int32)__64BPRTSIZE(get_val2(st, reference_uid(id, start), reference_getref(data)));
+
+				//清除栈顶
+				script_removetop(st, -1, 0);
+			}
+
+			j++;
+
+			// Option parameters
+			//获得随机属性option数组
+			data = script_getdata(st, j);
+
+			//验证数组
+			if (!mail_sub(st, data, sd, j + 1, &name, &start, &end, &id)) {
+				return SCRIPT_CMD_FAILURE;
+			}
+
+			//遍历所有已有物品
+			for (k = 0; k < num_items && start < end; k++, start++) {
+				//获得属性id对应的param
+				msg.item[k].option[i].param = (int32)__64BPRTSIZE(get_val2(st, reference_uid(id, start), reference_getref(data)));
+
+				//清除栈顶
+				script_removetop(st, -1, 0);
+			}
+		}
+
+		// Break the pseudo scope
+		break;
+	}
+
+	msg.status = MAIL_NEW;
+	msg.type = MAIL_INBOX_NORMAL;
+	msg.timestamp = time(NULL);
+	intif_Mail_send(0, &msg);
+	return SCRIPT_CMD_SUCCESS;
+}
