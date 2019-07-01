@@ -736,6 +736,8 @@
 	export_constant2("bRegenPercentSP", SP_REGEN_PERCENT_SP);
 	export_constant2("bSkillDelay",SP_SKILL_DELAY);
 	export_constant2("bNoWalkDelay",SP_NO_WALK_DELAY);
+	export_constant2("bLongSPGainValue",SP_LONG_SP_GAIN_VALUE);
+	export_constant2("bLongHPGainValue",SP_LONG_HP_GAIN_VALUE);
 
 	/* equip indices */
 	export_constant(EQI_COMPOUND_ON);
@@ -3479,6 +3481,12 @@
 	export_constant(RC2_BIO5_ACOLYTE_MERCHANT);
 	export_constant(RC2_BIO5_MAGE_ARCHER);
 	export_constant(RC2_BIO5_MVP);
+	export_constant(RC2_CLOCKTOWER);
+	export_constant(RC2_THANATOS);
+	export_constant(RC2_FACEWORM);
+	export_constant(RC2_HEARTHUNTER);
+	export_constant(RC2_ROCKRIDGE);
+	export_constant(RC2_WERNER_LAB);
 	export_constant(RC2_MAX);
 
 	/* classes */
@@ -4330,6 +4338,11 @@
 	export_constant(IIT_ENTER_Y);
 	export_constant(IIT_MAPCOUNT);
 	export_constant(IIT_MAP);
+
+	/* instance live info */
+	export_constant(ILI_NAME);
+	export_constant(ILI_MODE);
+	export_constant(ILI_OWNER);
 
 	/* VIP status */
 	export_constant(VIP_STATUS_ACTIVE);
